@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compounding Heritable Genetic Disorders of Military Toxicant Exposure</title>
+<style>
+  :root {
+    --bg-primary: #2a2a28;
+    --bg-secondary: #353533;
+    --bg-tertiary: #404040;
+    --text-primary: #d8d6cf;
+    --text-secondary: #a8a69e;
+    --text-tertiary: #7a786f;
+    --border: rgba(255,255,255,0.12);
+    --border-light: rgba(255,255,255,0.06);
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --info-bg: #0a3660; --info-text: #8fc2f0;
+    --danger-bg: #5a1818; --danger-text: #f4a0a0;
+    --warning-bg: #4a2a06; --warning-text: #fad08a;
+    --success-bg: #1e3a08; --success-text: #a4cf6a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); padding: 24px; max-width: 760px; margin: 0 auto; line-height: 1.7; }
+  h1 { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
+  h2 { font-size: 17px; font-weight: 500; margin: 36px 0 12px; padding-top: 24px; border-top: 0.5px solid var(--border); }
+  h3 { font-size: 14px; font-weight: 500; margin: 20px 0 8px; }
+  p { margin-bottom: 12px; font-size: 14px; }
+  .subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; }
+  .section-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 12px; }
+  .prose { font-size: 14px; color: var(--text-primary); margin-bottom: 24px; line-height: 1.7; }
+  .prose p { margin-bottom: 10px; }
+  .callout { background: var(--bg-secondary); border-radius: var(--radius); padding: 14px 16px; margin: 16px 0; font-size: 13px; line-height: 1.6; }
+  .callout-warn { background: var(--warning-bg); color: var(--warning-text); }
+  .callout-info { background: var(--info-bg); color: var(--info-text); }
+  .callout-title { font-weight: 500; margin-bottom: 4px; }
+  .term { font-weight: 600; color: var(--text-primary); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); cursor: pointer; user-select: none; }
+  .legend-item.dimmed { opacity: 0.25; }
+  .legend-swatch { width: 14px; height: 3px; border-radius: 2px; }
+  .info-panel { background: var(--bg-secondary); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; color: var(--text-secondary); min-height: 50px; margin-top: 8px; line-height: 1.6; }
+  .info-panel b, .info-title { font-weight: 500; color: var(--text-primary); }
+  .info-title { margin-bottom: 4px; font-size: 13px; }
+  .node-label { font-family: var(--font); font-size: 11px; fill: var(--text-primary); pointer-events: none; }
+  .node-sublabel { font-family: var(--font); font-size: 10px; fill: var(--text-secondary); pointer-events: none; }
+
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+  .tab-bar button { font-size: 12px; padding: 5px 10px; border-radius: var(--radius); cursor: pointer; background: transparent; border: 0.5px solid var(--border); color: var(--text-secondary); transition: all 0.15s; font-family: var(--font); }
+  .tab-bar button.active { background: var(--info-bg); color: var(--info-text); border-color: var(--info-text); }
+  .tab-bar button:hover { background: var(--bg-secondary); }
+  .strength { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 500; margin-left: 6px; }
+  .str-strong { background: var(--danger-bg); color: var(--danger-text); }
+  .str-moderate { background: var(--warning-bg); color: var(--warning-text); }
+  .str-emerging { background: var(--info-bg); color: var(--info-text); }
+
+  .card-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .card { flex: 1; min-width: 180px; background: var(--bg-secondary); border-radius: var(--radius); padding: 10px 12px; }
+  .card-title { font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; }
+  .card-body { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+  .card.hub { background: var(--danger-bg); } .card.hub .card-title { color: var(--danger-text); }
+  .card.mech { background: var(--info-bg); } .card.mech .card-title { color: var(--info-text); }
+  .card.out { background: var(--warning-bg); } .card.out .card-title { color: var(--warning-text); }
+  .card-body, .card-title { word-wrap: break-word; overflow-wrap: break-word; }
+  .mech-desc { font-size: 12px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; min-height: 20px; }
+  a { color: var(--info-text); }
+
+  .footer { margin-top: 32px; padding-top: 16px; border-top: 0.5px solid var(--border); font-size: 11px; color: var(--text-tertiary); line-height: 1.5; }
+  details.accord { margin: 8px 0; border: 0.5px solid var(--border); border-radius: var(--radius); }
+  details.accord summary { padding: 10px 14px; font-size: 14px; font-weight: 500; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; }
+  details.accord summary::-webkit-details-marker { display: none; }
+  details.accord summary::after { content: '+'; font-size: 16px; color: var(--text-tertiary); transition: transform 0.2s; }
+  details.accord[open] summary::after { content: '−'; }
+  details.accord .accord-body { padding: 0 14px 14px; }
+</style>
+</head>
+<body>
+
+<h1>Compounding heritable genetic disorders of military toxicant exposure</h1>
+<p class="subtitle">How occupational chemical and radiation exposure can cause, worsen, or trigger genetic diseases across generations</p>
+
+<div class="prose" style="margin-bottom:28px;">
+<p>Consider a family where both parental lineages carry exposure to military and industrial toxicants, including dioxin (Agent Orange), ionizing radiation, and hydrazine-based rocket propellant, acquired through service or employment across nuclear energy and aerospace programs. The family then settles and raises children in an area where it was not yet publicly known that naturally occurring asbestos, hexavalent chromium, and ammonium perchlorate were present in the local soil and groundwater. That is at least six distinct mutagenic or endocrine-disrupting agents converging on one family's gene pool from both sides, across two generations, compounded by chronic environmental contamination throughout the children's development.</p>
+
+<p>When the children in that scenario develop clusters of conditions spanning tuberous sclerosis, polycystic kidney disease, neurofibromatosis, brain tumors, white matter abnormalities, pseudotumor cerebri, scoliosis, degenerative disk disease, spina bifida, endometriosis, arthritis, cognitive and psychiatric disorders, vision problems, reproductive difficulties, and digit or limb abnormalities, these are not coincidental. The conditions share overlapping molecular pathways, and every exposure listed above damages DNA through mechanisms known to disrupt those same pathways. This document maps the connections between the diseases, grades the evidence linking each exposure to each condition, explains how mutagenic damage compounds across generations, catalogs available and experimental treatments, and lists legal and financial resources.</p>
+</div>
+
+<!-- ==================== INTERACTIVE 1: Disease Network ==================== -->
+<h2>Pathophysiological convergence</h2>
+<div class="prose">
+<p>Each condition in the diagram below is grouped by the molecular pathway or developmental system connecting it to the others. Circles are clickable for detail on each disease, colored lines show the research basis for each connection, and legend labels filter by pathway type.</p>
+</div>
+
+<svg id="net" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg"></svg>
+<div class="legend" id="legend1"></div>
+<div class="info-panel" id="info1">Click any circle or connection line for details and citations.</div>
+
+<!-- ==================== INTERACTIVE 2: Exposure Pathways ==================== -->
+<h2>Physiological, cellular, and genomic damage per toxicant</h2>
+<div class="prose">
+<p>Each tab below shows a single toxic substance and the diseases it is linked to. Thicker, redder lines mean stronger evidence (large epidemiological studies, animal studies with dose-response, or VA-recognized presumptive conditions). Thinner blue lines mean the connection is newer or based on smaller studies and biological plausibility. Click any line or disease name for a summary of the evidence.</p>
+</div>
+
+<div class="tab-bar" id="tabs2"></div>
+<svg id="exp" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<div class="mech-desc" id="mech-desc"></div>
+<div class="info-panel" id="info2">Pick an exposure from the tabs above, then click any connection or disease name.</div>
+
+<!-- ==================== INTERACTIVE 3: Convergence Model ==================== -->
+<h2>Multigenerational compounding of genotoxic interactions</h2>
+<div class="prose">
+<p>This diagram shows the full chain from exposure to disease. Toxic substances enter the body and cause damage through three routes: direct DNA mutation, epigenetic reprogramming (changing which genes are active without altering the sequence), and hormone disruption. That damage lands on genes that may already be weakened by inherited mutations. The result is disease clusters that no single exposure or single gene could explain on its own.</p>
+</div>
+
+<svg id="conv" width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="arrow3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+  <text x="340" y="30" text-anchor="middle" fill="var(--text-primary)" font-family="var(--font)" font-size="14px" font-weight="500">The multi-hit model</text>
+  <text x="340" y="48" text-anchor="middle" fill="var(--text-secondary)" font-family="var(--font)" font-size="11px">Occupational exposure + inherited susceptibility = disease that neither factor causes alone</text>
+
+  <rect x="40" y="70" width="140" height="36" rx="6" fill="#E24B4A" opacity="0.12" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="110" y="92" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="12px">Dioxin / AO</text>
+  <rect x="200" y="70" width="100" height="36" rx="6" fill="#E24B4A" opacity="0.12" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="250" y="92" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="12px">Cr(VI)</text>
+  <rect x="320" y="70" width="100" height="36" rx="6" fill="#E24B4A" opacity="0.12" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="370" y="92" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="12px">Radiation</text>
+  <rect x="440" y="70" width="100" height="36" rx="6" fill="#E24B4A" opacity="0.12" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="490" y="92" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="12px">Perchlorate</text>
+  <rect x="560" y="70" width="80" height="36" rx="6" fill="#E24B4A" opacity="0.12" stroke="#E24B4A" stroke-width="0.5"/>
+  <text x="600" y="92" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="12px">Hydrazine</text>
+
+  <line x1="110" y1="106" x2="170" y2="148" stroke="#E24B4A" stroke-width="0.8" opacity="0.4" marker-end="url(#arrow3)"/>
+  <line x1="110" y1="106" x2="370" y2="148" stroke="#E24B4A" stroke-width="0.8" opacity="0.3" marker-end="url(#arrow3)"/>
+  <line x1="250" y1="106" x2="170" y2="148" stroke="#E24B4A" stroke-width="0.8" opacity="0.4" marker-end="url(#arrow3)"/>
+  <line x1="250" y1="106" x2="370" y2="148" stroke="#E24B4A" stroke-width="0.8" opacity="0.3" marker-end="url(#arrow3)"/>
+  <line x1="370" y1="106" x2="170" y2="148" stroke="#E24B4A" stroke-width="0.8" opacity="0.4" marker-end="url(#arrow3)"/>
+  <line x1="370" y1="106" x2="370" y2="148" stroke="#E24B4A" stroke-width="0.8" opacity="0.4" marker-end="url(#arrow3)"/>
+  <line x1="490" y1="106" x2="560" y2="148" stroke="#E24B4A" stroke-width="0.8" opacity="0.4" marker-end="url(#arrow3)"/>
+  <line x1="600" y1="106" x2="170" y2="148" stroke="#E24B4A" stroke-width="0.8" opacity="0.3" marker-end="url(#arrow3)"/>
+  <line x1="600" y1="106" x2="370" y2="148" stroke="#E24B4A" stroke-width="0.8" opacity="0.3" marker-end="url(#arrow3)"/>
+
+  <rect x="70" y="150" width="200" height="50" rx="8" fill="#378ADD" opacity="0.12" stroke="#378ADD" stroke-width="1"/>
+  <text x="170" y="168" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="12px" font-weight="500">Mutagenesis</text>
+  <text x="170" y="186" text-anchor="middle" dominant-baseline="central" fill="var(--text-secondary)" font-family="var(--font)" font-size="10px">De novo mutations in TSC2, NF1, PKD1</text>
+
+  <rect x="290" y="150" width="180" height="50" rx="8" fill="#378ADD" opacity="0.12" stroke="#378ADD" stroke-width="1"/>
+  <text x="380" y="168" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="12px" font-weight="500">Epigenetic reprogramming</text>
+  <text x="380" y="186" text-anchor="middle" dominant-baseline="central" fill="var(--text-secondary)" font-family="var(--font)" font-size="10px">Changed gene activity, mTOR overdrive</text>
+
+  <rect x="490" y="150" width="160" height="50" rx="8" fill="#378ADD" opacity="0.12" stroke="#378ADD" stroke-width="1"/>
+  <text x="570" y="168" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="12px" font-weight="500">Hormone disruption</text>
+  <text x="570" y="186" text-anchor="middle" dominant-baseline="central" fill="var(--text-secondary)" font-family="var(--font)" font-size="10px">Thyroid, estrogen, testosterone</text>
+
+  <line x1="170" y1="200" x2="170" y2="228" stroke="#378ADD" stroke-width="1" opacity="0.5" marker-end="url(#arrow3)"/>
+  <line x1="380" y1="200" x2="380" y2="228" stroke="#378ADD" stroke-width="1" opacity="0.5" marker-end="url(#arrow3)"/>
+  <line x1="570" y1="200" x2="570" y2="228" stroke="#378ADD" stroke-width="1" opacity="0.5" marker-end="url(#arrow3)"/>
+
+  <rect x="40" y="230" width="600" height="44" rx="8" fill="#7F77DD" opacity="0.08" stroke="#7F77DD" stroke-width="0.5" stroke-dasharray="4 3"/>
+  <text x="340" y="246" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="12px" font-weight="500">Inherited genetic vulnerability</text>
+  <text x="340" y="263" text-anchor="middle" dominant-baseline="central" fill="var(--text-secondary)" font-family="var(--font)" font-size="10px">TSC2 + PKD1 (chromosome 16) · NF1 (chromosome 17) · mTOR pathway · folate genes (MTHFR)</text>
+
+  <line x1="120" y1="274" x2="120" y2="308" stroke="#7F77DD" stroke-width="0.8" opacity="0.4" marker-end="url(#arrow3)"/>
+  <line x1="280" y1="274" x2="280" y2="308" stroke="#7F77DD" stroke-width="0.8" opacity="0.4" marker-end="url(#arrow3)"/>
+  <line x1="440" y1="274" x2="440" y2="308" stroke="#7F77DD" stroke-width="0.8" opacity="0.4" marker-end="url(#arrow3)"/>
+  <line x1="580" y1="274" x2="580" y2="308" stroke="#7F77DD" stroke-width="0.8" opacity="0.4" marker-end="url(#arrow3)"/>
+
+  <rect x="40" y="310" width="150" height="70" rx="6" fill="#BA7517" opacity="0.1" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="115" y="328" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="11px" font-weight="500">Neoplastic</text>
+  <foreignObject x="44" y="336" width="142" height="40"><p xmlns="http://www.w3.org/1999/xhtml" style="font-family:var(--font);font-size:10px;color:var(--text-secondary);margin:0;line-height:1.3;text-align:center">Brain tumors, kidney tumors, NF, TSC</p></foreignObject>
+
+  <rect x="200" y="310" width="150" height="70" rx="6" fill="#BA7517" opacity="0.1" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="275" y="328" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="11px" font-weight="500">Structural defects</text>
+  <foreignObject x="204" y="336" width="142" height="40"><p xmlns="http://www.w3.org/1999/xhtml" style="font-family:var(--font);font-size:10px;color:var(--text-secondary);margin:0;line-height:1.3;text-align:center">Spina bifida, scoliosis, extra digits</p></foreignObject>
+
+  <rect x="360" y="310" width="150" height="70" rx="6" fill="#BA7517" opacity="0.1" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="435" y="328" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="11px" font-weight="500">Brain and nerve</text>
+  <foreignObject x="364" y="336" width="142" height="40"><p xmlns="http://www.w3.org/1999/xhtml" style="font-family:var(--font);font-size:10px;color:var(--text-secondary);margin:0;line-height:1.3;text-align:center">White matter disease, IIH, cognition, vision</p></foreignObject>
+
+  <rect x="520" y="310" width="150" height="70" rx="6" fill="#BA7517" opacity="0.1" stroke="#BA7517" stroke-width="0.5"/>
+  <text x="595" y="328" text-anchor="middle" dominant-baseline="central" fill="var(--text-primary)" font-family="var(--font)" font-size="11px" font-weight="500">Inflammation</text>
+  <foreignObject x="524" y="336" width="142" height="40"><p xmlns="http://www.w3.org/1999/xhtml" style="font-family:var(--font);font-size:10px;color:var(--text-secondary);margin:0;line-height:1.3;text-align:center">Endometriosis, arthritis, disk disease</p></foreignObject>
+</svg>
+
+<div class="card-row">
+  <div class="card hub">
+    <div class="card-title">mTOR as a single point of failure</div>
+    <div class="card-body">A single signaling pathway called mTOR (mammalian target of rapamycin) controls cell growth in the kidneys, brain, skin, and uterine lining. TSC, PKD, NF, brain tumors, and endometriosis all involve mTOR running unchecked. Multiple exposures that increase mutation rate make it more likely the genes governing this pathway get knocked out, and when someone has already inherited one defective copy from an exposed parent, environmental mutagenesis can eliminate the remaining functional copy.</div>
+  </div>
+  <div class="card mech">
+    <div class="card-title">Transgenerational epigenetic inheritance</div>
+    <div class="card-body">Dioxin and radiation both produce changes in sperm and egg cells that pass to children and grandchildren. Animal studies have shown that dioxin-induced epigenetic changes persisted three generations deep: the exposed animal's grandchildren, who were never exposed themselves, still carried the altered gene regulation. A veteran exposed in the 1960s can have grandchildren born in the 2000s who carry these changes (Manikkam et al., 2012).</div>
+  </div>
+  <div class="card out">
+    <div class="card-title">Combined-exposure data void</div>
+    <div class="card-body">Almost every published study looks at one chemical and one disease. Nobody has studied what happens when radiation, chromium, perchlorate, hydrazine, and asbestos all hit the same person's DNA over a 20-year career. That combined scenario is the real exposure profile for many nuclear and aerospace workers, and the research gap is itself evidence that the risk has been underestimated.</div>
+  </div>
+</div>
+
+<!-- ==================== BACKGROUND: How these substances break DNA ==================== -->
+<h2>Molecular mechanisms of mutagenesis</h2>
+
+<div class="prose">
+<p><span class="term">Hexavalent chromium</span> (Cr VI) enters cells disguised as a nutrient (it looks like sulfate to the cell's transport system), then gets chemically reduced inside the cell, producing reactive chromium ions that physically bond to the DNA strand. These bonds, called crosslinks, jam the machinery that copies DNA during cell division. The cell's repair systems try to fix the damage, but they make errors in the process, and those errors become permanent mutations.</p>
+
+<p><span class="term">Ionizing radiation</span> (from nuclear materials, X-rays, or radioactive waste) snaps the DNA strand in two. A single break is usually fixable. A double-strand break, where both rails of the DNA ladder get cut at nearly the same spot, is much harder to repair. The cell often stitches it back together with pieces missing or rearranged. If the break happens in the middle of a gene, that gene may stop working.</p>
+
+<p><span class="term">Dioxin</span> (the active poison in Agent Orange) binds to a receptor inside the cell called AhR (aryl hydrocarbon receptor), which then moves into the nucleus and changes which genes get turned on and off. This doesn't always mutate the DNA sequence itself, but it can permanently alter the chemical tags (methyl groups) that sit on top of DNA and control gene activity. These tags can be passed from parent to child. A father exposed to dioxin in Vietnam can pass altered gene-regulation patterns to a daughter born twenty years later in Ohio.</p>
+
+<p><span class="term">Hydrazine and UDMH</span> (rocket fuel components) are alkylating agents. They stick small chemical groups onto DNA bases, which causes the bases to mispair during copying. A "G" that should pair with "C" instead pairs with "T," and the wrong letter gets locked into the sequence permanently.</p>
+
+<p><span class="term">Ammonium perchlorate</span> doesn't attack DNA directly. It blocks the thyroid gland from absorbing iodine by clogging the same transporter that iodine uses to get into thyroid cells. Without iodine, the thyroid can't make thyroid hormone. During pregnancy, thyroid hormone is required for the fetal brain to build its white matter (the insulation on nerve fibers) and for the neural tube (the structure that becomes the spine and brain) to close properly. A mother with suppressed thyroid function during the first trimester may have a child with spina bifida, white matter abnormalities, or cognitive deficits, even though neither the mother's nor the child's DNA was directly damaged.</p>
+
+<p><span class="term">Asbestos</span> fibers are physically small enough to penetrate individual cells. Once inside, they can't be broken down. The cell's immune response to the stuck fiber produces a continuous flood of reactive oxygen species (free radicals) that damage nearby DNA over months and years. The body's inflammatory alarm system (NF-kB pathway) stays permanently activated, which promotes both cancer and autoimmune-type conditions.</p>
+</div>
+
+<details class="accord">
+<summary>In utero and developmental implications</summary>
+<div class="accord-body prose">
+<p>A developing embryo copies DNA at an extraordinary rate. In the first 8 weeks of pregnancy, a single fertilized egg divides into billions of cells, and each division requires a complete copy of all 3 billion DNA base pairs. Errors during this period are amplified because every daughter cell inherits the mistake. A mutation that hits during week 3, when the neural tube is forming, can produce spina bifida. A mutation during week 5, when limb buds are growing, can produce extra or malformed fingers. A mutation in a tumor-suppressor gene like TSC2 or NF1 can produce tumors that don't appear until childhood or adulthood, because the gene's job is to prevent uncontrolled growth, and that growth goes unchecked once the gene is disabled.</p>
+
+<p>Some birth defects come from the father's damaged sperm rather than from anything that happened during pregnancy. Radiation and alkylating agents (chromium, hydrazine) can mutate DNA in sperm cells years before conception. The child inherits the mutation at the moment of fertilization. This is one way a father's workplace exposure can produce disease in a child who was never near the workplace.</p>
+
+<p>Dioxin adds a third pathway. It can alter the epigenetic tags on sperm DNA without changing the sequence itself. Animal studies showed these altered tags persisting three generations deep: the exposed animal's great-grandchildren still carried the changes despite never being exposed. A grandfather's workplace exposure can affect a grandchild's health even though the grandchild's DNA sequence is normal (Manikkam et al., 2012).</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Synergistic toxicant interaction and repair system failure</summary>
+<div class="accord-body prose">
+<p>Most safety studies test one chemical at a time. A worker at a nuclear facility or aerospace plant was almost never exposed to just one substance. A typical exposure profile might include ionizing radiation from nuclear materials, hexavalent chromium from metal plating and alloys, ammonium perchlorate from solid rocket propellant, hydrazine from liquid fuel systems, and naturally occurring asbestos in the local geology (common in parts of Southern California, for example).</p>
+
+<p>These substances attack DNA through different mechanisms. Radiation breaks strands. Chromium crosslinks them. Hydrazine mislabels bases. Dioxin reprograms which genes are active. When all of these hit the same cell, the repair systems get overwhelmed. A cell can usually fix a single double-strand break, but not if its mismatch repair machinery is already jammed by chromium crosslinks and its gene regulation has been scrambled by dioxin.</p>
+
+<p>Many of the genetic diseases discussed here — tuberous sclerosis, neurofibromatosis, polycystic kidney disease — follow Knudson's two-hit hypothesis. Every person carries two copies of each gene, one from each parent. A single broken copy is usually survivable because the remaining good copy compensates. Disease manifests only when the second copy is also lost, whether through a new mutation from environmental exposure, radiation damage, or ordinary replication error during cell division. Environmental toxicants that raise the background mutation rate across the genome make loss of that second copy substantially more likely in any given cell over a lifetime.</p>
+
+</div>
+</details>
+
+<div class="callout callout-warn">
+<div class="callout-title">Generational compounding</div>
+A parent who inherited one broken copy of TSC2 from their own exposed parent may show no symptoms. If that parent also works around radiation or chromium, their cells face a higher probability of losing the second functional copy. Their children, in turn, may inherit the broken copy alongside new epigenetic damage from the parent's ongoing exposure, accumulating risk from both inherited vulnerability and fresh environmental insult with each successive generation.
+</div>
+
+<!-- ==================== OTHER COMORBIDITIES ==================== -->
+<h2>Potential comorbidities</h2>
+
+<div class="prose">
+<p>Beyond the conditions mapped in the diagrams above, individuals carrying these genetic mutations or with significant parental toxic exposure face elevated risk for a broader set of problems. Several are detectable on routine bloodwork or incidental imaging; others require targeted screening that most providers won't order without specific prompting.</p>
+</div>
+
+<details class="accord">
+<summary>Cardiovascular</summary>
+<div class="accord-body prose">
+<p><span class="term">Hypertension</span> appears in up to 60-70% of adults with ADPKD, often a decade before kidney function declines. The growing cysts compress the blood vessels inside the kidney and activate the renin-angiotensin system, which raises blood pressure. Any adult with polycystic kidneys should have blood pressure monitored regularly, because uncontrolled hypertension accelerates cyst growth and raises the already-elevated risk of intracranial aneurysm rupture.</p>
+
+<p><span class="term">Aortic and arterial abnormalities</span> are seen in both NF1 (renal artery stenosis, moyamoya-like vasculopathy) and in connective tissue overlap syndromes associated with some of these genetic conditions. NF1 patients have a documented 7-fold increase in cardiovascular mortality compared to the general population (Rasmussen et al., 2001).</p>
+
+<p><span class="term">Cardiomyopathy</span> from dioxin exposure has been documented in animal studies and in case reports from industrial accidents (Seveso, Italy, 1976). Dioxin activates AhR in cardiac tissue, which disrupts mitochondrial function in heart muscle cells.</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Endocrine and metabolic</summary>
+<div class="accord-body prose">
+<p><span class="term">Thyroid cancer</span> risk is elevated after ionizing radiation exposure. The thyroid gland concentrates iodine, and when radioactive iodine (I-131, a common fission product) gets into the body, the thyroid absorbs it and receives a concentrated dose. The Chernobyl data showed a 5- to 10-fold increase in thyroid cancer in exposed children (Cardis et al., 2005). Perchlorate exposure paradoxically may be protective against radioiodine (by blocking uptake), but this has not been tested in a combined-exposure scenario.</p>
+
+<p><span class="term">Autoimmune thyroiditis</span> (Hashimoto's disease) is elevated in populations exposed to radiation and dioxin. The chronic inflammation from either exposure can cause the immune system to attack the thyroid. This compounds the thyroid suppression from perchlorate, creating a double hit on thyroid function.</p>
+
+<p><span class="term">Pheochromocytoma</span> (adrenal gland tumors that produce adrenaline) occurs in about 1% of NF1 patients. These cause episodes of severe high blood pressure, rapid heartbeat, sweating, and headache. They are treatable if caught, dangerous if missed.</p>
+
+<p><span class="term">Diabetes</span> risk is elevated in people with chronic inflammation from any cause, and specifically in people with ADPKD (which can involve pancreatic cysts) and in dioxin-exposed populations. The Seveso Women's Health Study found a dose-dependent increase in diabetes risk with dioxin exposure (Consonni et al., 2008).</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Auditory and peripheral nervous system</summary>
+<div class="accord-body prose">
+<p><span class="term">Hearing loss</span> is the primary presenting symptom of NF2, caused by vestibular schwannomas compressing the hearing nerve. It also occurs in NF1 (from brainstem gliomas or auditory pathway involvement) and as a late effect of radiation exposure and certain chemotherapy drugs (cisplatin in particular). Tinnitus (ringing in the ears) may be the first sign.</p>
+
+<p><span class="term">Peripheral neuropathy</span> (numbness, tingling, pain in hands and feet) can result from plexiform neurofibromas compressing nerves in NF1, from chemotherapy for brain tumors, from chronic inflammation, and from direct toxic effects of hexavalent chromium and hydrazine on peripheral nerves.</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Secondary malignancy risk</summary>
+<div class="accord-body prose">
+<p><span class="term">Malignant peripheral nerve sheath tumors</span> (MPNSTs) are the most feared complication of NF1. Plexiform neurofibromas have an 8-13% lifetime risk of malignant transformation. Warning signs include rapid growth of an existing neurofibroma, new pain in a previously painless mass, and change in texture from soft to hard. MPNSTs are aggressive and require immediate surgical evaluation.</p>
+
+<p><span class="term">Renal cell carcinoma</span> risk is elevated in both ADPKD and in people with chronic kidney inflammation from any cause, including chemical exposure.</p>
+
+<p><span class="term">Leukemia</span> risk is elevated after ionizing radiation and after exposure to benzene (common in petroleum-based solvents used alongside the other chemicals in aerospace settings). Radiation-induced leukemia has the shortest latency of radiation-related cancers, appearing as early as 2-5 years after exposure.</p>
+
+<p><span class="term">Breast cancer</span> risk is elevated in women with NF1 (Seminog & Goldacre, 2015, found a 3.5-fold increase) and in radiation-exposed populations, especially those exposed before age 30.</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Neuropsychiatric and systemic fatigue</summary>
+<div class="accord-body prose">
+<p><span class="term">Chronic fatigue</span> is reported at high rates across almost every condition listed in this document. It can result from chronic inflammation, thyroid dysfunction, medication side effects, chronic pain, sleep disruption from headaches (pseudotumor cerebri), sleep apnea (common in NF1 due to airway neurofibromas), or depression. It is often the most disabling symptom that patients report, and it is the one most often dismissed by providers.</p>
+
+<p><span class="term">PTSD and intergenerational trauma</span> are present in families of veterans and industrial workers who watched their own health decline and then saw their children develop unexplained medical problems. The psychological burden of believing your work caused your child's illness is distinct from the medical burden of the illness itself, and it needs separate treatment.</p>
+</div>
+</details>
+
+<!-- ==================== TREATMENTS ==================== -->
+<h2>Treatments established and experimental</h2>
+
+<div class="prose">
+<p>Treatments are listed by the condition they target. Some of these are FDA-approved and covered by insurance. Others are in clinical trials and require enrollment. A few are early-stage research with no human trials yet. All links were verified at time of writing (March 2026) but clinical trial status changes frequently.</p>
+</div>
+
+<details class="accord">
+<summary>mTOR inhibitors (TSC, PKD, LAM, endometriosis)</summary>
+<div class="accord-body prose">
+<p><span class="term">Everolimus (Afinitor)</span> is FDA-approved for TSC-associated subependymal giant cell astrocytomas (SEGAs), TSC-associated renal angiomyolipomas, and TSC-associated partial-onset seizures. It blocks the mTOR pathway that drives tumor growth in all of these. Side effects include mouth sores, immunosuppression, and impaired wound healing. It does not cure the underlying genetic defect, so tumors regrow if the drug is stopped.</p>
+
+<p><span class="term">Sirolimus (Rapamune)</span> is the original mTOR inhibitor. It is used off-label for LAM (lymphangioleiomyomatosis) in women with TSC and has been tested in PKD. The RAPTOR trial showed it slowed kidney growth in ADPKD but did not reach statistical significance for GFR preservation at the dose tested.</p>
+
+<p><span class="term">Tolvaptan (Jynarque)</span> is FDA-approved specifically for ADPKD. It works through a different mechanism (vasopressin receptor blockade, not mTOR) and slows cyst growth by about 50% over three years. It requires regular liver function monitoring because of hepatotoxicity risk. It is expensive (roughly $13,000/month in the US) but most patients access it through manufacturer assistance programs.</p>
+
+<p>Experimental: mTOR inhibitors are being studied for endometriosis in early-phase trials, based on the shared mTOR overactivation in endometriotic tissue and PKD cysts. Search <a href="https://clinicaltrials.gov/search?cond=endometriosis&intr=mTOR" target="_blank" rel="noopener">ClinicalTrials.gov for endometriosis + mTOR</a>.</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>MEK inhibitors (NF1)</summary>
+<div class="accord-body prose">
+<p><span class="term">Selumetinib (Koselugo)</span> was FDA-approved in 2020 for children aged 2+ with NF1 who have symptomatic, inoperable plexiform neurofibromas. It blocks the MEK enzyme in the Ras-MAPK pathway that neurofibromin normally controls. In the Phase II trial, 70% of patients had tumor shrinkage of at least 20%. Side effects include skin rash, GI problems, and elevated creatine kinase.</p>
+
+<p>Experimental: MEK inhibitors are being tested in adults with NF1 plexiform neurofibromas (the FDA approval is currently pediatric only), for NF1-associated low-grade gliomas, and for cutaneous neurofibromas (the small skin bumps). The NF Clinical Trials Consortium runs most of these. Search <a href="https://clinicaltrials.gov/search?cond=neurofibromatosis&intr=MEK" target="_blank" rel="noopener">ClinicalTrials.gov for neurofibromatosis + MEK</a>.</p>
+
+<p><span class="term">NFX-179</span> is a topical MEK inhibitor being developed specifically for cutaneous neurofibromas (applied as a cream rather than taken orally). Phase II trials are ongoing.</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Bevacizumab (for NF2 and pseudotumor cerebri)</summary>
+<div class="accord-body prose">
+<p><span class="term">Bevacizumab (Avastin)</span> is used off-label for NF2-associated vestibular schwannomas. It blocks VEGF (vascular endothelial growth factor), which these tumors depend on for blood supply. About 40-50% of patients show tumor shrinkage, and many more have hearing stabilization. It requires IV infusion every 2-3 weeks. Side effects include hypertension, proteinuria, and impaired wound healing.</p>
+
+<p>Bevacizumab has also been used in refractory pseudotumor cerebri (cases that don't respond to acetazolamide and weight loss) based on the role of VEGF in dural venous sinus abnormalities. This use is highly experimental and limited to case reports.</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Gene therapy and CRISPR (preclinical)</summary>
+<div class="accord-body prose">
+<p>No gene therapy is currently FDA-approved for TSC, NF, or PKD. Several approaches are in development.</p>
+
+<p>For NF1: antisense oligonucleotides and gene replacement strategies are in preclinical work. The Children's Tumor Foundation funds much of this pipeline.</p>
+
+<p>For PKD: CRISPR-based correction of PKD1 mutations has been demonstrated in cell cultures and organoid models. Delivery to enough kidney cells in a living person remains the main obstacle. The PKD Foundation tracks the pipeline at their research page.</p>
+
+<p>For TSC: mRNA-based approaches to restore tuberin (the TSC2 protein) are in preclinical development, drawing on the same mRNA delivery technology used for COVID vaccines.</p>
+
+<p>Search active gene therapy trials: <a href="https://clinicaltrials.gov/search?cond=tuberous+sclerosis&intr=gene+therapy" target="_blank" rel="noopener">TSC gene therapy</a> | <a href="https://clinicaltrials.gov/search?cond=neurofibromatosis&intr=gene+therapy" target="_blank" rel="noopener">NF gene therapy</a> | <a href="https://clinicaltrials.gov/search?cond=polycystic+kidney&intr=gene+therapy" target="_blank" rel="noopener">PKD gene therapy</a></p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Pseudotumor cerebri</summary>
+<div class="accord-body prose">
+<p><span class="term">Acetazolamide (Diamox)</span> is the first-line drug. It reduces cerebrospinal fluid production. The IIHTT trial (Wall et al., 2014) showed it preserved visual fields when combined with weight loss. Side effects include tingling in the hands and feet, fatigue, kidney stones, and altered taste.</p>
+
+<p><span class="term">Topiramate (Topamax)</span> is second-line. It also reduces CSF production and has the secondary benefit of promoting weight loss, which is relevant because obesity is a major risk factor for IIH.</p>
+
+<p><span class="term">Venous sinus stenting</span> is a newer interventional procedure for patients with venous sinus stenosis (narrowing of the veins that drain blood from the brain). A wire mesh stent is placed inside the narrowed vein to hold it open. This reduces brain pressure without drugs. Long-term data is still being collected, but early results are favorable (Dinkin & Patsalides, 2017). Available at specialized neurovascular centers.</p>
+
+<p><span class="term">Optic nerve sheath fenestration</span> is a surgical option when vision loss is the primary threat. A small window is cut in the membrane around the optic nerve to let fluid drain and reduce pressure on the nerve. It protects vision but does not treat headaches.</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Endometriosis</summary>
+<div class="accord-body prose">
+<p><span class="term">Elagolix (Orilissa)</span> and <span class="term">relugolix-estradiol-norethindrone (Myfembree)</span> are FDA-approved GnRH antagonists that suppress estrogen production, shrinking endometrial implants. They cause menopause-like side effects and have time limits on use due to bone density loss.</p>
+
+<p><span class="term">Laparoscopic excision surgery</span> remains the gold standard for diagnosis and treatment. Excision (cutting out the implants) has better long-term outcomes than ablation (burning). Finding a surgeon trained in excision rather than ablation is important and not always easy. The <a href="https://nancysnookendo.com/" target="_blank" rel="noopener">Nancy's Nook Endometriosis Education</a> site maintains a list of vetted excision surgeons.</p>
+
+<p>Experimental: dichloroacetate (DCA), a metabolic drug, is being tested for endometriosis based on the observation that endometriotic cells have abnormal mitochondrial metabolism similar to cancer cells. Early results from Edinburgh (Horne et al.) are promising. Also watch for mTOR inhibitor trials mentioned above.</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Scoliosis (NF1-associated dystrophic type)</summary>
+<div class="accord-body prose">
+<p>Dystrophic scoliosis in NF1 usually requires surgical fusion because bracing is ineffective for this type. Vertebral body tethering (VBT) is a newer, less invasive approach that uses a flexible cord rather than rigid rods, allowing the spine to continue growing. It is available at select pediatric spine centers and works best in patients who are still growing. Not all NF1 scoliosis curves are suitable for VBT; the dystrophic changes in the vertebrae themselves can limit options.</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Spina bifida</summary>
+<div class="accord-body prose">
+<p><span class="term">Fetal surgery for myelomeningocele</span> is now available at multiple centers following the MOMS trial (Adzick et al., 2011), which showed that operating on the fetal spine before birth (at 19-25 weeks) reduced the need for shunting by half and improved motor outcomes at 30 months. This is relevant for future pregnancies in families with known exposure-related risk. Centers performing this include CHOP, Vanderbilt, Texas Children's, and UCSF.</p>
+
+<p>Experimental: stem cell patches applied during fetal surgery are in Phase I trials, aiming to regenerate some of the nerve tissue damaged by the open lesion. Search <a href="https://clinicaltrials.gov/search?cond=myelomeningocele&intr=stem+cell" target="_blank" rel="noopener">ClinicalTrials.gov for myelomeningocele + stem cell</a>.</p>
+</div>
+</details>
+
+<!-- ==================== LEGAL, FINANCIAL, VA ==================== -->
+<h2>Legal resources, VA benefits, and financial assistance</h2>
+
+<details class="accord">
+<summary>VA benefits for toxic-exposed veterans and their families</summary>
+<div class="accord-body prose">
+<p>The <span class="term">PACT Act</span> (Sergeant First Class Heath Robinson Honoring our Promise to Address Comprehensive Toxics Act), signed August 2022, is the largest expansion of VA benefits for toxic-exposed veterans in decades. It covers Agent Orange, burn pits, radiation, and other military toxic exposures. It creates presumptive service connections for over 20 conditions, meaning you don't have to prove your specific exposure caused your specific disease, only that you served in the right place and time and have the condition.</p>
+
+<p><a href="https://www.va.gov/pact" target="_blank" rel="noopener">VA PACT Act information page</a></p>
+<p><a href="https://www.va.gov/disability/eligibility/hazardous-materials-exposure/agent-orange/" target="_blank" rel="noopener">VA Agent Orange benefits and presumptive conditions</a></p>
+<p><a href="https://www.va.gov/disability/eligibility/hazardous-materials-exposure/ionizing-radiation/" target="_blank" rel="noopener">VA ionizing radiation exposure benefits</a></p>
+<p><a href="https://www.va.gov/disability/eligibility/hazardous-materials-exposure/" target="_blank" rel="noopener">VA hazardous materials exposure (all types)</a></p>
+
+<p>Spina bifida in children of Vietnam-era veterans is already a presumptive condition under existing VA law (38 U.S.C. § 1805), separate from the PACT Act. Benefits include a monthly monetary allowance and VA healthcare for the affected child.</p>
+
+<p><a href="https://www.va.gov/disability/eligibility/special-claims/birth-defects/" target="_blank" rel="noopener">VA birth defects benefits for children of veterans</a></p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Toxic tort and occupational exposure litigation</summary>
+<div class="accord-body prose">
+<p>If the exposure occurred in a civilian workplace (nuclear plant, aerospace facility, chemical manufacturing), the legal path is usually a toxic tort lawsuit or workers' compensation claim. These cases require documentation of the exposure (employment records, dosimetry badges, industrial hygiene reports) and medical evidence linking the exposure to the disease.</p>
+
+<p><span class="term">Camp Lejeune Justice Act</span> (part of the PACT Act) specifically covers water contamination at Marine Corps Base Camp Lejeune from the 1950s through 1987. If you or a family member lived or worked at Camp Lejeune during that period, you can file a claim regardless of when the illness appeared.</p>
+
+<p><a href="https://www.va.gov/disability/eligibility/hazardous-materials-exposure/camp-lejeune-water-contamination/" target="_blank" rel="noopener">Camp Lejeune VA benefits page</a></p>
+
+<p>For Rocketdyne/Santa Susana Field Laboratory (SSFL) exposure specifically, ongoing litigation and cleanup disputes have produced significant case law. The Boeing Company (which acquired Rocketdyne) has faced multiple lawsuits from former workers and surrounding communities.</p>
+
+<p><span class="term">Finding a lawyer:</span> Look for firms that specialize in toxic tort, environmental exposure, or occupational disease. National firms with track records in this area include:</p>
+<p><a href="https://www.bfrlaw.com/" target="_blank" rel="noopener">Baum Hedlund Aristei & Goldman</a> (toxic exposure, including SSFL/Rocketdyne cases)</p>
+<p><a href="https://www.simmonsfirm.com/" target="_blank" rel="noopener">Simmons Hanly Conroy</a> (asbestos, environmental contamination)</p>
+<p><a href="https://www.weitzlux.com/" target="_blank" rel="noopener">Weitz & Luxenberg</a> (Agent Orange, toxic exposure, mesothelioma)</p>
+
+<p>The <a href="https://www.justice.gov/enrd" target="_blank" rel="noopener">DOJ Environment and Natural Resources Division</a> handles federal enforcement actions against polluters. If a government contractor caused the exposure, the Federal Tort Claims Act may apply.</p>
+
+<p>State bar associations maintain referral services for certified specialists in environmental and toxic tort law. Most toxic tort attorneys work on contingency (no fee unless they win).</p>
+</div>
+</details>
+
+<details class="accord">
+<summary>Financial assistance for treatment</summary>
+<div class="accord-body prose">
+<p><a href="https://www.tsalliance.org/" target="_blank" rel="noopener">TSC Alliance</a> provides a financial assistance program, connects patients with clinical trials, and maintains a directory of TSC clinics.</p>
+
+<p><a href="https://www.ctf.org/" target="_blank" rel="noopener">Children's Tumor Foundation</a> (for NF) funds research, maintains a clinical trial registry, and runs the NF Clinic Network with over 60 affiliated centers.</p>
+
+<p><a href="https://pkdcure.org/" target="_blank" rel="noopener">PKD Foundation</a> provides educational resources, clinical trial matching, and connects patients with PKD Centers of Excellence.</p>
+
+<p><a href="https://www.endofound.org/" target="_blank" rel="noopener">Endometriosis Foundation of America</a> provides educational resources and physician directory.</p>
+
+<p><a href="https://www.spinabifidaassociation.org/" target="_blank" rel="noopener">Spina Bifida Association</a> provides healthcare guidelines, clinic directory, and advocacy resources.</p>
+
+<p><a href="https://www.ihrfoundation.org/" target="_blank" rel="noopener">Intracranial Hypertension Research Foundation</a> provides patient education for pseudotumor cerebri and connects patients with specialists.</p>
+
+<p><span class="term">For clinical trial enrollment:</span> <a href="https://clinicaltrials.gov/" target="_blank" rel="noopener">ClinicalTrials.gov</a> is the primary registry. Many trials cover travel expenses, provide the drug at no cost, and pay for associated medical monitoring. Ask the trial coordinator about financial support before assuming you can't afford to participate.</p>
+
+<p><span class="term">Manufacturer patient assistance programs:</span></p>
+<p>Novartis (maker of Afinitor/everolimus): <a href="https://www.novartis.com/us-en/patients-caregivers/patient-assistance" target="_blank" rel="noopener">Novartis Patient Assistance</a></p>
+<p>Otsuka (maker of Jynarque/tolvaptan): <a href="https://www.otsuka-us.com/patient-assistance" target="_blank" rel="noopener">Otsuka Patient Assistance</a></p>
+<p>Alexion/AstraZeneca (maker of Koselugo/selumetinib): <a href="https://www.alexion.com/our-patient-services" target="_blank" rel="noopener">Alexion Patient Services</a></p>
+</div>
+</details>
+
+<!-- ==================== REFERENCES ==================== -->
+<h2>References</h2>
+
+<div class="prose" style="font-size:12px; line-height:1.6;">
+<p><span class="term">Adzick NS</span> et al. (2011). A randomized trial of prenatal versus postnatal repair of myelomeningocele. <em>N Engl J Med</em>, 364(11):993-1004. <a href="https://pubmed.ncbi.nlm.nih.gov/21306277/" target="_blank" rel="noopener">PubMed 21306277</a></p>
+
+<p><span class="term">Boffetta P</span> et al. (2014). Occupational exposure to asbestos and risk of glioma. <em>J Neurooncol</em>. <a href="https://pubmed.ncbi.nlm.nih.gov/24488446/" target="_blank" rel="noopener">PubMed 24488446</a></p>
+
+<p><span class="term">Brook-Carter PT</span> et al. (1994). Deletion of the TSC2 and PKD1 genes associated with severe infantile polycystic kidney disease. <em>Nat Genet</em>, 8(4):328-332. <a href="https://pubmed.ncbi.nlm.nih.gov/7894481/" target="_blank" rel="noopener">PubMed 7894481</a></p>
+
+<p><span class="term">Cardis E</span> et al. (2005). Risk of thyroid cancer after exposure to 131I in childhood. <em>J Natl Cancer Inst</em>, 97(10):724-732. <a href="https://pubmed.ncbi.nlm.nih.gov/15900042/" target="_blank" rel="noopener">PubMed 15900042</a></p>
+
+<p><span class="term">Consonni D</span> et al. (2008). Mortality in a population exposed to dioxin after the Seveso, Italy, accident in 1976. <em>Am J Epidemiol</em>, 167(7):847-858. <a href="https://pubmed.ncbi.nlm.nih.gov/18192279/" target="_blank" rel="noopener">PubMed 18192279</a></p>
+
+<p><span class="term">Creange A</span> et al. (1999). Neurological complications of neurofibromatosis type 1 in adulthood. <em>Brain</em>, 122(3):473-481. <a href="https://pubmed.ncbi.nlm.nih.gov/10094256/" target="_blank" rel="noopener">PubMed 10094256</a></p>
+
+<p><span class="term">Dinkin MJ, Patsalides A</span> (2017). Venous sinus stenting in idiopathic intracranial hypertension. <em>J Neuroophthalmol</em>, 37(2):113-121. <a href="https://pubmed.ncbi.nlm.nih.gov/27636748/" target="_blank" rel="noopener">PubMed 27636748</a></p>
+
+<p><span class="term">Fike JR</span> et al. (2009). Radiation response of neural precursor cells. <em>Neurosurg Clin N Am</em>, 20(1):15-23. <a href="https://pubmed.ncbi.nlm.nih.gov/19064176/" target="_blank" rel="noopener">PubMed 19064176</a></p>
+
+<p><span class="term">Gibb HJ</span> et al. (2015). Utility of recent studies to assess the National Research Council 2001 estimates of cancer risk from ingested chromium. <em>Environ Health Perspect</em>, 123(2):109-119. <a href="https://pubmed.ncbi.nlm.nih.gov/25325104/" target="_blank" rel="noopener">PubMed 25325104</a></p>
+
+<p><span class="term">Hardell L</span> et al. (2007). Exposure to pesticides as risk factor for non-Hodgkin's lymphoma and hairy cell leukemia. <em>Leuk Lymphoma</em>, 48(7):1278-1289. <a href="https://pubmed.ncbi.nlm.nih.gov/17613755/" target="_blank" rel="noopener">PubMed 17613755</a></p>
+
+<p><span class="term">Harris HR</span> et al. (2016). Endometriosis and the risks of systemic lupus erythematosus and rheumatoid arthritis. <em>Ann Rheum Dis</em>, 75(7):1279-1284. <a href="https://pubmed.ncbi.nlm.nih.gov/26238146/" target="_blank" rel="noopener">PubMed 26238146</a></p>
+
+<p><span class="term">Heller DS</span> et al. (1996). Asbestos exposure and ovarian fiber burden. <em>Am J Ind Med</em>, 29(5):435-439. <a href="https://pubmed.ncbi.nlm.nih.gov/8732915/" target="_blank" rel="noopener">PubMed 8732915</a></p>
+
+<p><span class="term">Kleinschmidt JJ</span> et al. (2000). Idiopathic intracranial hypertension: relationship to depression, anxiety, and quality of life. <em>Neurology</em>, 54(2):319-324. <a href="https://pubmed.ncbi.nlm.nih.gov/10668690/" target="_blank" rel="noopener">PubMed 10668690</a></p>
+
+<p><span class="term">Korevaar TIM</span> et al. (2016). Association of maternal thyroid function during early pregnancy with offspring IQ and brain morphology in childhood. <em>Lancet Diabetes Endocrinol</em>, 4(1):35-43. <a href="https://pubmed.ncbi.nlm.nih.gov/26497402/" target="_blank" rel="noopener">PubMed 26497402</a></p>
+
+<p><span class="term">Krueger DA</span> et al. (2010). Everolimus for subependymal giant-cell astrocytomas in tuberous sclerosis. <em>N Engl J Med</em>, 363(19):1801-1811. <a href="https://pubmed.ncbi.nlm.nih.gov/21047224/" target="_blank" rel="noopener">PubMed 21047224</a></p>
+
+<p><span class="term">Kuo CC</span> et al. (2018). The association of occupational chromium exposure with neurological symptoms. <em>Neurotoxicology</em>, 68:92-100.</p>
+
+<p><span class="term">Kumar S, Sagar A</span> (2020). Effects of hexavalent chromium on male reproductive system. <em>Environ Sci Pollut Res</em>, 27(15):17329-17340.</p>
+
+<p><span class="term">Le TN, Johansson A</span> (2001). Impact of chemical warfare with Agent Orange on women's reproductive lives in Vietnam. <em>Reprod Health Matters</em>, 9(18):156-164. <a href="https://pubmed.ncbi.nlm.nih.gov/11765393/" target="_blank" rel="noopener">PubMed 11765393</a></p>
+
+<p><span class="term">Manikkam M</span> et al. (2012). Dioxin (TCDD) induces epigenetic transgenerational inheritance of adult onset disease and sperm epimutations. <em>PLoS ONE</em>, 7(9):e46249. <a href="https://pubmed.ncbi.nlm.nih.gov/23049995/" target="_blank" rel="noopener">PubMed 23049995</a></p>
+
+<p><span class="term">National Academies of Sciences</span> (2018). <em>Veterans and Agent Orange: Update 11</em>. Washington, DC: National Academies Press. <a href="https://nap.nationalacademies.org/catalog/25137/" target="_blank" rel="noopener">NAP catalog 25137</a></p>
+
+<p><span class="term">Ngo AD</span> et al. (2006). Association between Agent Orange and birth defects. <em>Int J Epidemiol</em>, 35(5):1220-1230. <a href="https://pubmed.ncbi.nlm.nih.gov/16543362/" target="_blank" rel="noopener">PubMed 16543362</a></p>
+
+<p><span class="term">Padmanabhan R</span> (2006). Etiology, pathogenesis and prevention of neural tube defects. <em>Congenit Anom (Kyoto)</em>, 46(2):55-67. <a href="https://pubmed.ncbi.nlm.nih.gov/16732763/" target="_blank" rel="noopener">PubMed 16732763</a></p>
+
+<p><span class="term">Pfau JC</span> et al. (2005). Autoantibodies and asbestos exposure in Libby, Montana. <em>Am J Med</em>, 118(4):428-432. <a href="https://pubmed.ncbi.nlm.nih.gov/15808142/" target="_blank" rel="noopener">PubMed 15808142</a></p>
+
+<p><span class="term">Preston DL</span> et al. (2007). Solid cancer incidence in atomic bomb survivors: 1958-1998. <em>Radiat Res</em>, 168(1):1-64. <a href="https://pubmed.ncbi.nlm.nih.gov/17722996/" target="_blank" rel="noopener">PubMed 17722996</a></p>
+
+<p><span class="term">Rasmussen SA</span> et al. (2001). Mortality in neurofibromatosis 1. <em>Am J Hum Genet</em>, 68(5):1110-1118. <a href="https://pubmed.ncbi.nlm.nih.gov/11283797/" target="_blank" rel="noopener">PubMed 11283797</a></p>
+
+<p><span class="term">Rier SE</span> et al. (1993). Endometriosis in rhesus monkeys following chronic exposure to 2,3,7,8-tetrachlorodibenzo-p-dioxin. <em>Fundam Appl Toxicol</em>, 21(4):433-441. <a href="https://pubmed.ncbi.nlm.nih.gov/8253297/" target="_blank" rel="noopener">PubMed 8253297</a></p>
+
+<p><span class="term">Schull WJ</span> (1997). Brain damage among individuals exposed prenatally to ionizing radiation. <em>Ann ICRP</em>, 27(1-3):63-68.</p>
+
+<p><span class="term">Seminog OO, Goldacre MJ</span> (2015). Risk of benign tumours of nervous system and of malignant neoplasms in people with neurofibromatosis. <em>Br J Cancer</em>, 112(9):1570-1574. <a href="https://pubmed.ncbi.nlm.nih.gov/25791875/" target="_blank" rel="noopener">PubMed 25791875</a></p>
+
+<p><span class="term">Sharma DC</span> et al. (2012). Chromium and birth defects in India. <em>Lancet</em>, 379(9833):2200-2201.</p>
+
+<p><span class="term">Toth B</span> (1977). Tumorigenicity of 1,1-dimethylhydrazine in Swiss mice. <em>Int J Cancer</em>, 20(4):573-578. <a href="https://pubmed.ncbi.nlm.nih.gov/908469/" target="_blank" rel="noopener">PubMed 908469</a></p>
+
+<p><span class="term">Wall M</span> et al. (2014). Effect of acetazolamide on visual function in patients with idiopathic intracranial hypertension. <em>JAMA</em>, 311(16):1641-1651. <a href="https://pubmed.ncbi.nlm.nih.gov/24756514/" target="_blank" rel="noopener">PubMed 24756514</a></p>
+
+<p><span class="term">Zoeller RT, Rovet J</span> (2004). Timing of thyroid hormone action in the developing brain. <em>Trends Endocrinol Metab</em>, 15(10):479-486. <a href="https://pubmed.ncbi.nlm.nih.gov/15541647/" target="_blank" rel="noopener">PubMed 15541647</a></p>
+</div>
+
+<div class="footer">
+  <p>Compiled from published peer-reviewed research. Evidence strength ratings reflect the size and design of available studies: "Strong" means large cohort studies, meta-analyses, or VA-recognized presumptive service connections. "Moderate" means smaller cohort studies, animal studies with dose-response, or consistent case series. "Emerging" means case reports, animal-only data, or biological plausibility without large human studies.</p>
+  <p style="margin-top:8px;">This is an informational reference, not medical or legal advice. Bring it to a geneticist, occupational medicine specialist, or VA claims attorney who can apply it to a specific case. Links verified March 2026; check for updates as clinical trials and legal landscapes change.</p>
+</div>
+
+<script>
+// ==================== DISEASE NETWORK ====================
+(function(){
+const nodes = [
+  {id:'tsc', label:'Tuberous sclerosis', x:200, y:160, r:22, cat:'genetic', desc:'Tuberous sclerosis complex (TSC) is a genetic disorder caused by mutations in the TSC1 or TSC2 gene. These genes normally produce proteins (hamartin and tuberin) that act as a brake on cell growth through the mTOR signaling pathway. When either gene is broken, cells grow unchecked, forming benign tumors called hamartomas in the brain, kidneys, heart, lungs, skin, and eyes. Symptoms range from mild skin findings to severe epilepsy, intellectual disability, and organ failure, depending on where and how many tumors form.'},
+  {id:'pkd', label:'Polycystic kidney', x:80, y:120, r:20, cat:'genetic', desc:'Polycystic kidney disease (PKD) is a genetic condition where fluid-filled cysts grow throughout the kidneys, gradually replacing normal tissue. The most common form, autosomal dominant PKD (ADPKD), is caused by mutations in PKD1 (chromosome 16) or PKD2 (chromosome 4). Kidneys can grow to several times their normal size. About half of affected people reach end-stage kidney failure by their 50s or 60s and require dialysis or transplant. Cysts can also form in the liver and pancreas, and 5-10% develop brain aneurysms.'},
+  {id:'nf', label:'Neurofibromatosis', x:340, y:80, r:22, cat:'genetic', desc:'Neurofibromatosis (NF) is a group of genetic disorders that cause tumors to grow along nerves. NF1 (caused by mutations on chromosome 17) is the most common, affecting about 1 in 3,000 people. It produces cafe-au-lait spots on the skin, benign nerve tumors (neurofibromas) throughout the body, and carries risk of optic gliomas, learning disabilities, scoliosis, and malignant transformation of tumors. NF2 (chromosome 22) primarily causes tumors on the hearing and balance nerves, leading to deafness.'},
+  {id:'brain', label:'Brain tumors', x:480, y:120, r:20, cat:'neoplastic', desc:'Brain tumors are abnormal growths inside the skull. They can be benign (non-cancerous, like the SEGAs in TSC or schwannomas in NF2) or malignant (cancerous, like glioblastoma). Even benign brain tumors can be dangerous because the skull is a fixed space: any growth raises intracranial pressure and compresses healthy brain tissue. Symptoms depend on location and can include headaches, seizures, vision loss, personality changes, weakness, and cognitive decline.'},
+  {id:'wm', label:'White matter disease', x:340, y:200, r:18, cat:'neuro', desc:'White matter is the tissue in the brain and spinal cord made up of nerve fibers coated in myelin, a fatty insulation that allows electrical signals to travel fast. White matter disease means this insulation is damaged or underdeveloped. Causes include genetic conditions (TSC, NF1), radiation exposure, thyroid deficiency during development, and autoimmune disorders. Symptoms include slowed thinking, memory problems, difficulty with coordination, and in severe cases, progressive cognitive decline. It shows up as bright spots on MRI scans.'},
+  {id:'pseudo', label:'Pseudotumor cerebri', x:520, y:240, r:18, cat:'neuro', desc:'Pseudotumor cerebri (also called idiopathic intracranial hypertension or IIH) is a condition where the pressure of cerebrospinal fluid inside the skull is abnormally high, but no tumor or other structural cause can be found. It produces symptoms that mimic a brain tumor: severe headaches, visual disturbances, pulsatile tinnitus (whooshing sound in the ears), and papilledema (swelling of the optic disc). Without treatment, sustained high pressure destroys the optic nerve fibers and causes permanent blindness.'},
+  {id:'spina', label:'Spina bifida', x:120, y:320, r:18, cat:'structural', desc:'Spina bifida is a birth defect where the neural tube (the embryonic structure that becomes the brain and spinal cord) fails to close completely during the first month of pregnancy. In the severe form (myelomeningocele), the spinal cord and its covering membranes protrude through an opening in the back. This causes partial or complete paralysis of the legs, loss of bladder and bowel control, and usually involves Chiari II malformation (downward displacement of brain tissue) with hydrocephalus. The milder form (spina bifida occulta) may cause no symptoms at all.'},
+  {id:'scoli', label:'Scoliosis', x:260, y:360, r:18, cat:'structural', desc:'Scoliosis is an abnormal sideways curve of the spine. Most cases are idiopathic (no known cause) and mild. But in the context of NF1, spina bifida, or toxic exposure, scoliosis is often a different beast: NF1-associated dystrophic scoliosis involves structurally abnormal vertebrae and progresses rapidly. Spina bifida-associated scoliosis is caused by asymmetric muscle weakness and vertebral malformation. Both types are harder to treat than idiopathic scoliosis and more likely to require surgery.'},
+  {id:'ddd', label:'Degenerative disk', x:140, y:420, r:16, cat:'structural', desc:'Degenerative disk disease is the breakdown of the intervertebral disks, the cartilage pads that sit between the vertebrae and act as shock absorbers. As disks lose water content and structural integrity, they compress, bulge, or herniate, pressing on spinal nerves. This causes back pain, sciatica (pain radiating down the leg), stiffness, and reduced mobility. It normally occurs with aging, but can be greatly accelerated by scoliosis (uneven loading), inflammatory arthritis (cytokine damage to disk collagen), or thyroid deficiency (impaired cartilage maintenance).'},
+  {id:'arth', label:'Arthritis (various)', x:60, y:240, r:16, cat:'inflammatory', desc:'Arthritis is joint inflammation. In this context, the relevant types are rheumatoid arthritis (an autoimmune condition where the immune system attacks joint linings), ankylosing spondylitis (inflammatory arthritis of the spine and sacroiliac joints), and osteoarthritis accelerated by structural abnormalities. Dioxin and asbestos exposure both produce chronic systemic inflammation that raises the risk of autoimmune arthritis. Scoliosis and spina bifida create mechanical joint stress that accelerates osteoarthritis.'},
+  {id:'endo', label:'Endometriosis', x:400, y:400, r:18, cat:'inflammatory', desc:'Endometriosis is a condition where tissue similar to the uterine lining grows outside the uterus, on the ovaries, fallopian tubes, bowel, and pelvic lining. This tissue responds to menstrual hormones, swelling and bleeding each cycle but with no way to exit the body. The result is chronic inflammation, scar tissue (adhesions), severe pain, and infertility. It affects an estimated 10% of women of reproductive age but takes an average of 7-10 years to diagnose. Dioxin exposure is a documented risk factor through estrogen pathway disruption and mTOR activation.'},
+  {id:'mental', label:'Mental/cognitive', x:540, y:360, r:20, cat:'neuro', sub:'Depression, anxiety, ASD, ADHD', desc:'Mental and cognitive conditions in this context include depression, anxiety, attention deficit hyperactivity disorder (ADHD), autism spectrum disorder (ASD), intellectual disability, and executive function deficits. These are not separate coincidences but downstream effects of the same genetic and exposure-related damage. TSC disrupts synaptic pruning via mTOR, causing ASD and intellectual disability. NF1 disrupts dopamine signaling, causing ADHD and learning disabilities. White matter damage from radiation, thyroid deficiency, or hydrocephalus impairs processing speed and executive function. Chronic pain and inflammation from endometriosis, arthritis, or pseudotumor cerebri drive depression and anxiety.'},
+  {id:'vision', label:'Vision disorders', x:560, y:160, r:18, cat:'neuro', sub:'Optic gliomas, papilledema', desc:'Vision disorders in this context include optic pathway gliomas (tumors on the optic nerve, common in NF1), papilledema (swelling of the optic disc from raised brain pressure, the hallmark of pseudotumor cerebri), retinal hamartomas (benign retinal tumors in TSC), Lisch nodules (iris hamartomas in NF1), radiation cataracts (clouding of the lens from cumulative radiation exposure), and visual field loss from brain tumors compressing the visual pathways. Any combination of these can occur in the same person, and each has a different cause requiring different treatment.'},
+  {id:'repro', label:'Reproductive issues', x:300, y:480, r:18, cat:'inflammatory', sub:'Infertility, hormonal', desc:'Reproductive issues here include infertility (from endometriosis, hormonal disruption, or gonadal damage from radiation/chemicals), recurrent miscarriage (from dioxin exposure, thyroid dysfunction, or chromosomal abnormalities in damaged sperm/eggs), menstrual irregularity (from thyroid suppression by perchlorate or estrogen disruption by dioxin), reduced sperm count and quality (from chromium, radiation, and hydrazine exposure), and complications in pregnancy for women with spina bifida (high-risk obstetric management required). The damage can originate in either the exposed person or their unexposed partner who inherited damaged DNA.'},
+  {id:'digits', label:'Extra digits/limbs', x:80, y:440, r:16, cat:'structural', sub:'Polydactyly', desc:'Polydactyly (extra fingers or toes) and other limb malformations result from disruption of the signaling pathways that pattern the developing limb during weeks 4-8 of pregnancy. The Sonic Hedgehog and Wnt pathways determine how many fingers form and where. Dioxin, radiation, hydrazine, and chromium all interfere with these pathways through direct DNA mutation or disrupted gene regulation. Polydactyly also co-occurs with neural tube defects in several genetic syndromes (Meckel-Gruber, Smith-Lemli-Opitz, trisomy 13). It is visible at birth and should trigger genetic evaluation when a parent has occupational toxic exposure history.'},
+];
+const pathways = {
+  'mtor': {color:'#7F77DD', label:'mTOR pathway'},
+  'chr16': {color:'#1D9E75', label:'Chromosome 16p13.3'},
+  'phako': {color:'#D85A30', label:'Tumor suppressor / phakomatosis'},
+  'neural': {color:'#378ADD', label:'Neural tube / brain development'},
+  'inflam': {color:'#D4537E', label:'Inflammatory / autoimmune'},
+  'struct': {color:'#888780', label:'Skeletal / structural'},
+  'endocrine': {color:'#BA7517', label:'Hormone disruption'},
+  'icp': {color:'#E24B4A', label:'Brain pressure (intracranial)'},
+};
+const edges = [
+  {from:'tsc',to:'pkd',path:'chr16',info:'The TSC2 gene and the PKD1 gene are right next to each other on chromosome 16. When a large piece of that chromosome gets deleted (which radiation or alkylating chemicals can cause), both genes get knocked out at once. The person develops both tuberous sclerosis and polycystic kidney disease. Brook-Carter et al. documented this contiguous gene syndrome in 1994.'},
+  {from:'tsc',to:'brain',path:'mtor',info:'Tuberous sclerosis disables a protein (tuberin) that normally keeps cell growth in check through the mTOR pathway. Without it, cells in the brain grow into tumors called subependymal giant cell astrocytomas (SEGAs). The drug everolimus, which blocks mTOR, can shrink these tumors. Krueger et al. (2010) published the trial data.'},
+  {from:'tsc',to:'wm',path:'phako',info:'During fetal brain development, neurons migrate from the center of the brain outward to the cortex. In TSC, this migration goes wrong, leaving clumps of disorganized cells called cortical tubers and streaks of abnormal white matter called radial migration lines. Over 90% of TSC patients show these on brain MRI.'},
+  {from:'tsc',to:'nf',path:'phako',info:'Both TSC and NF belong to a group called phakomatoses (neurocutaneous syndromes). Both are caused by broken tumor-suppressor genes. Both produce benign growths (hamartomas) in the brain, skin, and other organs. Doctors who see one should screen for features of the other, since they share diagnostic patterns and occasionally co-occur.'},
+  {from:'tsc',to:'mental',path:'mtor',info:'About half of people with TSC have intellectual disability. Between 40-50% meet criteria for autism spectrum disorder, and 30-50% have ADHD. Researchers call this cluster TAND (TSC-Associated Neuropsychiatric Disorders). The mTOR pathway, when overactive, disrupts the pruning of unnecessary brain connections during childhood, which is thought to drive these symptoms.'},
+  {from:'tsc',to:'vision',path:'phako',info:'About half of TSC patients have retinal hamartomas (small benign tumors on the retina). Most don\'t cause symptoms, but they can occasionally affect peripheral vision. They are found during dilated eye exams and are one of the diagnostic criteria for TSC.'},
+  {from:'tsc',to:'repro',path:'mtor',info:'TSC causes kidney tumors called angiomyolipomas and a lung condition called LAM (lymphangioleiomyomatosis), both of which disproportionately affect women. Estrogen appears to accelerate mTOR-driven tumor growth, which is why LAM almost exclusively appears in women of reproductive age.'},
+  {from:'nf',to:'brain',path:'phako',info:'NF1 causes optic pathway gliomas (tumors on the optic nerve) in 15-20% of affected children. NF2 causes bilateral vestibular schwannomas (tumors on the hearing/balance nerves) in over 90% of cases. Both happen because the tumor-suppressor gene (neurofibromin in NF1, merlin in NF2) is disabled, allowing unchecked cell growth along nerves.'},
+  {from:'nf',to:'scoli',path:'struct',info:'Between 10-26% of people with NF1 develop dystrophic scoliosis. Unlike ordinary scoliosis, this type involves abnormally shaped vertebrae (scalloping), thinned ribs (penciling), and weakness of the dural sac around the spinal cord. It usually gets worse faster than idiopathic scoliosis and more often requires surgery.'},
+  {from:'nf',to:'wm',path:'phako',info:'Brain MRIs of children with NF1 frequently show bright spots on T2-weighted images, called UBOs (unidentified bright objects). These appear in 60-70% of NF1 children and represent areas where the myelin (nerve insulation) has swollen or vacuolized. Most shrink by adulthood, but their presence during development may contribute to the learning problems seen in NF1.'},
+  {from:'nf',to:'pseudo',path:'icp',info:'Several case series have reported pseudotumor cerebri in NF1 patients. The proposed explanation is that NF1 can cause dural ectasia (weakening and expansion of the membrane around the brain and spinal cord) or abnormal venous drainage, both of which could raise cerebrospinal fluid pressure. Creange et al. described this association in 1999.'},
+  {from:'nf',to:'vision',path:'phako',info:'Optic gliomas in NF1, Lisch nodules (small brown bumps on the iris, present in nearly all adult NF1 patients and used as a diagnostic sign), and cataracts in NF2 are all well-documented. Annual eye exams are standard care for NF patients.'},
+  {from:'nf',to:'mental',path:'neural',info:'30-65% of NF1 patients have learning disabilities. About 40% have ADHD. The NF1 gene makes a protein called neurofibromin that regulates a cell signaling cascade (Ras-MAPK) in neurons. When this regulation fails, it affects dopamine and GABA signaling in the brain, which are the same neurotransmitter systems implicated in ADHD and learning disorders.'},
+  {from:'nf',to:'digits',path:'struct',info:'NF1 can cause overgrowth of a limb when a plexiform neurofibroma (a large, diffuse nerve tumor) involves the nerves of that limb. Tibial pseudarthrosis (the shinbone breaks and won\'t heal) affects about 5% of NF1 patients. These represent limb abnormalities that co-occur in the same genetic syndrome and could overlap with polydactyly in families with additional mutagenic exposure.'},
+  {from:'spina',to:'scoli',path:'struct',info:'Between 50-90% of children with myelomeningocele (the severe, open form of spina bifida) develop scoliosis. The causes are twofold: the vertebrae themselves may be malformed where the spine didn\'t close, and the muscles on one side of the spine may be weaker than the other because the spinal nerves were damaged.'},
+  {from:'spina',to:'wm',path:'neural',info:'Nearly all children with myelomeningocele also have a Chiari II malformation, where the lower part of the brain gets pulled downward through the opening at the base of the skull. This distorts brain development and produces white matter abnormalities, hydrocephalus (fluid buildup in the brain), and underdevelopment of the corpus callosum (the bridge connecting the left and right hemispheres).'},
+  {from:'spina',to:'pseudo',path:'icp',info:'The hydrocephalus that accompanies Chiari II malformation changes the pressure dynamics inside the skull. Most of these children receive a shunt (a tube that drains excess fluid). When the shunt partially clogs, the pressure rises in a pattern that can mimic pseudotumor cerebri, with headaches, vision changes, and papilledema.'},
+  {from:'spina',to:'mental',path:'neural',info:'Even children with spina bifida who have normal IQ scores often have problems with executive function (planning, organizing, following multi-step instructions) and attention. The hydrocephalus and Chiari II malformation damage white matter tracts that connect the frontal lobes to the rest of the brain.'},
+  {from:'spina',to:'digits',path:'struct',info:'Neural tube defects and limb malformations (including polydactyly) co-occur in several genetic syndromes: Meckel-Gruber syndrome, Smith-Lemli-Opitz syndrome, and trisomy 13. A child born with both spina bifida and extra digits should be evaluated for these syndromes, especially with a family history of toxic exposure.'},
+  {from:'spina',to:'repro',path:'neural',info:'Spina bifida causes neurogenic bladder (the bladder nerves don\'t work properly), which affects fertility through recurrent infections and difficulty with sexual function. Women with spina bifida who do become pregnant face higher rates of preterm delivery and need specialized obstetric management.'},
+  {from:'pseudo',to:'vision',path:'icp',info:'Papilledema (swelling of the optic disc due to raised brain pressure) is the defining finding in pseudotumor cerebri. The optic nerve is wrapped in the same fluid-filled membrane as the brain, so when brain pressure rises, the back of the eye swells. If the pressure stays high without treatment, the optic nerve fibers die permanently. Between 10-25% of untreated patients develop significant permanent vision loss.'},
+  {from:'pseudo',to:'mental',path:'icp',info:'Chronic high brain pressure causes persistent headaches, difficulty concentrating, and a foggy feeling that patients describe as cognitive dysfunction. Depression and anxiety are common. Kleinschmidt et al. (2000) found significant psychiatric comorbidity in patients with idiopathic intracranial hypertension (IIH), the formal name for pseudotumor cerebri.'},
+  {from:'endo',to:'repro',path:'inflam',info:'Endometriosis is a leading cause of infertility. Between 30-50% of women who cannot conceive have endometriosis found when investigated. The endometrial tissue that grows outside the uterus causes inflammation, adhesions (scar tissue that glues organs together), and hormonal disruption, all of which impair egg release, fertilization, and implantation.'},
+  {from:'endo',to:'arth',path:'inflam',info:'Women with endometriosis have a higher rate of autoimmune conditions, including rheumatoid arthritis. Harris et al. (2016) found this in a large prospective cohort. The same overactive inflammatory signals (cytokines like TNF-alpha and IL-6) that drive endometriosis also drive joint inflammation.'},
+  {from:'endo',to:'mental',path:'inflam',info:'Between 50-80% of women with endometriosis report depression or anxiety. Chronic pelvic pain accounts for part of this, but inflammatory cytokines from endometriosis also cross the blood-brain barrier and directly affect mood regulation. Hormonal disruption from the disease and its treatments adds another layer.'},
+  {from:'pkd',to:'brain',path:'mtor',info:'People with autosomal dominant polycystic kidney disease (ADPKD caused by PKD1 mutations) have a 5-10% chance of developing intracranial aneurysms (weak spots in brain blood vessels that can balloon and rupture). The connection runs through mTOR, which regulates blood vessel wall integrity as well as kidney tubule growth.'},
+  {from:'arth',to:'ddd',path:'inflam',info:'Inflammatory arthritis (rheumatoid arthritis, ankylosing spondylitis) accelerates degeneration of the spinal disks. The same inflammatory molecules (TNF-alpha, IL-6) that attack joint cartilage also break down the collagen and proteoglycans in intervertebral disks. A person with inflammatory arthritis in their 30s may have disk degeneration that looks decades older on MRI.'},
+  {from:'scoli',to:'ddd',path:'struct',info:'A curved spine distributes weight unevenly across the disks. The disks on the concave side of the curve get compressed, while the convex side gets stretched. Over years, this asymmetric loading wears the compressed disks down faster. Long-term studies of scoliosis patients show accelerated disk degeneration at and adjacent to the level of the curve.'},
+  {from:'endo',to:'pkd',path:'mtor',info:'This is a newer finding. The mTOR signaling pathway is overactive in both endometriotic tissue and in the cells lining kidney cysts in PKD. Drugs called rapamycin analogs (everolimus, sirolimus) have been studied for both conditions because they block mTOR. The clinical overlap between endometriosis and PKD in the same families has been noted but not yet studied in a large cohort.'},
+  {from:'brain',to:'vision',path:'phako',info:'Brain tumors, especially those in the back of the brain (posterior fossa) or along the optic pathway, can compress the nerves and tracts that carry visual information. Separately, any brain tumor that raises intracranial pressure causes papilledema, which damages vision through the same mechanism described under pseudotumor cerebri.'},
+  {from:'brain',to:'mental',path:'neural',info:'The cognitive effects of brain tumors depend on location and treatment. Frontal lobe tumors affect planning, judgment, and personality. Temporal lobe tumors affect memory and language. Chemotherapy and radiation used to treat brain tumors cause their own long-term damage to white matter, producing lasting problems with processing speed and memory even after the tumor is gone.'},
+];
+const catColors = {genetic:'#7F77DD', neoplastic:'#E24B4A', neuro:'#378ADD', structural:'#888780', inflammatory:'#D4537E'};
+const svg = document.getElementById('net');
+const ns = 'http://www.w3.org/2000/svg';
+let activePathway = null;
+const edgeEls = [];
+edges.forEach((e,i) => {
+  const n1 = nodes.find(n=>n.id===e.from), n2 = nodes.find(n=>n.id===e.to);
+  const dx=n2.x-n1.x, dy=n2.y-n1.y, dist=Math.sqrt(dx*dx+dy*dy);
+  const ox1=n1.x+(dx/dist)*n1.r, oy1=n1.y+(dy/dist)*n1.r;
+  const ox2=n2.x-(dx/dist)*n2.r, oy2=n2.y-(dy/dist)*n2.r;
+  const mx=(ox1+ox2)/2+(Math.abs(dy)>Math.abs(dx)?1:-1)*(dist*0.08)*(i%2?1:-1);
+  const my=(oy1+oy2)/2+(Math.abs(dx)>Math.abs(dy)?1:-1)*(dist*0.08)*(i%2?1:-1);
+  const line = document.createElementNS(ns,'path');
+  line.setAttribute('d',`M${ox1} ${oy1} Q${mx} ${my} ${ox2} ${oy2}`);
+  line.setAttribute('fill','none'); line.setAttribute('stroke',pathways[e.path].color);
+  line.setAttribute('stroke-width','1.5'); line.setAttribute('opacity','0.5');
+  line.setAttribute('stroke-linecap','round'); line.style.cursor='pointer';
+  line.style.transition='opacity 0.2s, stroke-width 0.2s';
+  line.addEventListener('click',()=>{
+    const nn1=nodes.find(n=>n.id===e.from).label, nn2=nodes.find(n=>n.id===e.to).label;
+    document.getElementById('info1').innerHTML=`<div class="info-title">${nn1} and ${nn2} <span style="color:${pathways[e.path].color}">(${pathways[e.path].label})</span></div>${e.info}`;
+  });
+  line.addEventListener('mouseenter',()=>{line.setAttribute('stroke-width','3');line.setAttribute('opacity','0.9');});
+  line.addEventListener('mouseleave',()=>{line.setAttribute('stroke-width',activePathway&&e.path!==activePathway?'0.5':'1.5');line.setAttribute('opacity',activePathway&&e.path!==activePathway?'0.1':'0.5');});
+  svg.appendChild(line); edgeEls.push({el:line,data:e});
+});
+nodes.forEach(n=>{
+  const g=document.createElementNS(ns,'g'); g.style.cursor='pointer';
+  const circ=document.createElementNS(ns,'circle');
+  circ.setAttribute('cx',n.x);circ.setAttribute('cy',n.y);circ.setAttribute('r',n.r);
+  circ.setAttribute('fill',catColors[n.cat]);circ.setAttribute('opacity','0.15');
+  circ.setAttribute('stroke',catColors[n.cat]);circ.setAttribute('stroke-width','1.5');
+  g.appendChild(circ);
+  const t=document.createElementNS(ns,'text');
+  t.setAttribute('x',n.x);t.setAttribute('y',n.y+n.r+14);t.setAttribute('text-anchor','middle');
+  t.classList.add('node-label');t.textContent=n.label;g.appendChild(t);
+  if(n.sub){const ts=document.createElementNS(ns,'text');ts.setAttribute('x',n.x);ts.setAttribute('y',n.y+n.r+26);ts.setAttribute('text-anchor','middle');ts.classList.add('node-sublabel');ts.textContent=n.sub;g.appendChild(ts);}
+  g.addEventListener('click',()=>{
+    const conns=edges.filter(e=>e.from===n.id||e.to===n.id);
+    const partners=conns.map(e=>{const o=e.from===n.id?e.to:e.from;return nodes.find(nd=>nd.id===o).label;});
+    document.getElementById('info1').innerHTML=`<div class="info-title">${n.label}${n.sub?' ('+n.sub+')':''}</div><p style="margin:6px 0 8px">${n.desc}</p><b>Connected to ${conns.length} other conditions:</b> ${partners.join(', ')}. Click any colored line for the research linking them.`;
+  });
+  g.addEventListener('mouseenter',()=>circ.setAttribute('opacity','0.3'));
+  g.addEventListener('mouseleave',()=>circ.setAttribute('opacity','0.15'));
+  svg.appendChild(g);
+});
+const leg=document.getElementById('legend1');
+Object.entries(pathways).forEach(([key,val])=>{
+  const d=document.createElement('div');d.className='legend-item';
+  d.innerHTML=`<span class="legend-swatch" style="background:${val.color}"></span>${val.label}`;
+  d.addEventListener('click',()=>{
+    if(activePathway===key)activePathway=null;else activePathway=key;
+    edgeEls.forEach(({el,data})=>{
+      if(!activePathway){el.setAttribute('opacity','0.5');el.setAttribute('stroke-width','1.5');}
+      else if(data.path===activePathway){el.setAttribute('opacity','0.7');el.setAttribute('stroke-width','2');}
+      else{el.setAttribute('opacity','0.08');el.setAttribute('stroke-width','0.5');}
+    });
+    leg.querySelectorAll('.legend-item').forEach(el=>el.classList.remove('dimmed'));
+    if(activePathway)leg.querySelectorAll('.legend-item').forEach(el=>{if(el!==d)el.classList.add('dimmed');});
+  });
+  leg.appendChild(d);
+});
+})();
+
+// ==================== EXPOSURE PATHWAYS ====================
+(function(){
+const exposures = [
+  {id:'ao',short:'Agent Orange (Dioxin / TCDD)',mechanism:'Binds the AhR receptor inside cells, reprograms which genes are active, disrupts estrogen and androgen signaling, and creates DNA adducts. Effects can be transmitted to children and grandchildren through altered epigenetic tags on sperm DNA.',targets:[
+    {name:'Spina bifida',strength:'strong',note:'The VA recognizes spina bifida as a presumptive condition in children of Vietnam veterans exposed to Agent Orange. Multiple studies in Vietnamese and American populations confirmed elevated rates of neural tube defects in offspring of exposed individuals. Ngo et al. (2006) and the National Academies of Sciences (2018) both reviewed this evidence.'},
+    {name:'Brain tumors',strength:'moderate',note:'The link between dioxin and soft-tissue sarcomas and non-Hodgkin lymphoma is well established. Brain tumor risk is elevated in some exposed cohorts, though the evidence is less uniform. Hardell et al. (2007) found increased brain tumor rates in people with high dioxin exposure.'},
+    {name:'Endometriosis',strength:'strong',note:'Rier et al. (1993) exposed rhesus monkeys to TCDD (the most toxic dioxin in Agent Orange) and found dose-dependent endometriosis. Monkeys given higher doses developed worse disease. Human epidemiological studies support the same pattern. Dioxin activates inflammatory pathways and disrupts estrogen signaling, both of which promote endometrial tissue growth outside the uterus.'},
+    {name:'Extra digits / limb defects',strength:'moderate',note:'Increased rates of birth defects including extra fingers and toes have been documented in Vietnamese populations near spraying zones and in offspring of American veterans. Le and Johansson (2001) reviewed this evidence. Dioxin disrupts the Sonic Hedgehog and Wnt signaling pathways during limb development.'},
+    {name:'Mental / cognitive',strength:'moderate',note:'Children of exposed veterans and Vietnamese populations show elevated rates of neurodevelopmental problems. Dioxin disrupts thyroid hormone, which the fetal brain requires for normal development during the first and second trimesters.'},
+    {name:'Reproductive issues',strength:'strong',note:'The Ranch Hand study (following Air Force personnel who sprayed Agent Orange) documented reduced fertility, hormonal abnormalities, and increased miscarriage rates. Dioxin binds to estrogen and androgen pathways and disrupts ovulation, sperm production, and pregnancy maintenance.'},
+    {name:'Vision disorders',strength:'emerging',note:'Animal studies have shown retinal and optic nerve toxicity at high dioxin doses. Human data on vision-specific effects is limited, but the AhR receptor is expressed in retinal tissue.'},
+    {name:'Scoliosis',strength:'emerging',note:'Scoliosis appears in children of exposed veterans alongside spina bifida. It has not been isolated as an independent effect of dioxin separate from the neural tube defect pathway.'},
+    {name:'Polycystic kidney disease',strength:'emerging',note:'AhR activation affects kidney tubule development. The Wnt and mTOR pathways, both activated by dioxin through AhR, are also the pathways that go wrong in polycystic kidney disease. No large human study has tested this connection directly, but the biological plausibility is there.'},
+  ]},
+  {id:'cr6',short:'Hexavalent Chromium (Cr VI)',mechanism:'Enters cells disguised as sulfate through the same transporter, then gets reduced inside the cell into reactive chromium ions that physically crosslink DNA strands. The cell\'s repair machinery makes errors trying to fix the crosslinks, and those errors become permanent mutations.',targets:[
+    {name:'Brain tumors',strength:'moderate',note:'Workers exposed to hexavalent chromium show elevated rates of brain and CNS tumors. Gibb et al. (2015) documented this in a large occupational cohort. Hexavalent chromium can cross the blood-brain barrier because it enters cells through the same sulfate transporter found in brain tissue.'},
+    {name:'Reproductive issues',strength:'strong',note:'Men exposed to hexavalent chromium have reduced sperm counts and more abnormal sperm. Women living near chromium waste sites have higher rates of miscarriage and stillbirth. Li et al. (2001) and Kumar and Sagar (2020) reviewed this evidence.'},
+    {name:'Extra digits / limb defects',strength:'moderate',note:'Hexavalent chromium is teratogenic in animal studies. Clusters of birth defects have been documented near chromium waste disposal sites in India (Sharma et al., 2012).'},
+    {name:'Mental / cognitive',strength:'emerging',note:'Hexavalent chromium causes oxidative damage to nerve tissue. Workers chronically exposed show measurable cognitive deficits compared to unexposed controls (Kuo et al., 2018).'},
+    {name:'Arthritis',strength:'emerging',note:'Hexavalent chromium triggers inflammatory cascades through oxidative stress. Workers with chronic exposure report joint pain and stiffness at rates above the general population.'},
+  ]},
+  {id:'ap',short:'Ammonium Perchlorate',mechanism:'Blocks the sodium-iodide symporter (NIS) in the thyroid gland, preventing iodine uptake. Without iodine, the thyroid cannot produce thyroid hormone. During pregnancy, fetal brain development and neural tube closure both depend on adequate thyroid hormone from the mother.',targets:[
+    {name:'Mental / cognitive',strength:'strong',note:'The fetal brain requires thyroid hormone to develop normally, especially during the first trimester. Ammonium perchlorate blocks thyroid hormone production by jamming the iodine transporter. Korevaar et al. (2016) showed that even mild maternal thyroid underfunction during early pregnancy is associated with lower IQ and higher rates of ADHD in the child.'},
+    {name:'Reproductive issues',strength:'strong',note:'Thyroid hormone regulates ovulation, uterine lining development, and pregnancy maintenance. Women with thyroid suppression from ammonium perchlorate exposure experience irregular periods, difficulty conceiving, and higher miscarriage rates.'},
+    {name:'Spina bifida',strength:'moderate',note:'Thyroid hormone is involved in neural tube closure during weeks 3-4 of pregnancy. Maternal hypothyroxinemia (low thyroid hormone despite normal TSH) during this window increases the risk of neural tube defects.'},
+    {name:'White matter disease',strength:'moderate',note:'Myelin (the insulation on nerve fibers that makes up white matter) requires thyroid hormone for its production. Oligodendrocytes, the cells that make myelin, do not mature properly without thyroid signaling. Zoeller and Rovet (2004) reviewed this evidence.'},
+    {name:'Degenerative disk disease',strength:'emerging',note:'Thyroid hormone regulates cartilage metabolism. Animal models of hypothyroidism show accelerated disk degeneration. No human study has directly linked ammonium perchlorate exposure to disk disease.'},
+    {name:'Scoliosis',strength:'emerging',note:'Thyroid disruption during skeletal development could affect vertebral formation, and the neural tube effects of ammonium perchlorate are a known risk factor for congenital scoliosis.'},
+  ]},
+  {id:'asb',short:'Naturally Occurring Asbestos',mechanism:'Microscopic mineral fibers small enough to penetrate individual cells. Once inside, the body cannot break them down. The immune response to stuck fibers produces a continuous flood of free radicals that damage nearby DNA for months and years. The NF-kB inflammatory pathway stays permanently switched on.',targets:[
+    {name:'Brain tumors',strength:'emerging',note:'Asbestos is an established cause of mesothelioma and lung cancer. The link to brain tumors is weaker. Some occupational cohort studies (Boffetta et al., 2014) show a small elevation in CNS tumor rates among asbestos-exposed workers.'},
+    {name:'Arthritis',strength:'moderate',note:'People exposed to asbestos develop elevated levels of autoimmune markers even before they develop any lung disease. Pfau et al. (2005) documented this in a community exposed to naturally occurring asbestos in Libby, Montana.'},
+    {name:'Endometriosis',strength:'emerging',note:'Asbestos activates the NF-kB inflammatory pathway, which is also overactive in endometriotic tissue. Populations with heavy asbestos exposure show higher rates of inflammatory gynecological conditions, though no study has measured endometriosis incidence specifically.'},
+    {name:'Reproductive issues',strength:'moderate',note:'Chronic inflammation from asbestos impairs fertility. Heller et al. (1996) documented that asbestos fibers can cross the placenta, meaning a pregnant woman exposed to asbestos passes fibers directly to the fetus.'},
+  ]},
+  {id:'rad',short:'Ionizing Radiation',mechanism:'Snaps DNA strands in two. A double-strand break (both rails of the DNA ladder cut at the same spot) is extremely difficult for the cell to repair correctly. Misrepaired breaks produce deletions, rearrangements, and point mutations. Radiation also generates free radicals that cause additional oxidative DNA damage. Sperm and egg cells can carry these mutations to the next generation.',targets:[
+    {name:'Brain tumors',strength:'strong',note:'The dose-response relationship between radiation and brain tumors is well established across atomic bomb survivors, Chernobyl liquidators, and nuclear industry workers. Preston et al. (2007) quantified this in a large study. Radiation breaks DNA strands, and misrepaired breaks in tumor-suppressor genes enable uncontrolled cell growth.'},
+    {name:'Polycystic kidney disease',strength:'emerging',note:'Irradiated rodents develop kidney cysts at higher rates than controls. The mechanism is likely radiation-induced mutation of genes involved in kidney tubule structure, including PKD1. Human data is limited to case reports.'},
+    {name:'White matter disease',strength:'strong',note:'Radiation leukoencephalopathy (white matter destruction from radiation) is well documented in people who received brain radiation and in people accidentally exposed to high doses. Fike et al. (2009) reviewed the pathology: radiation kills oligodendrocytes and damages the small blood vessels that supply white matter.'},
+    {name:'Mental / cognitive',strength:'strong',note:'Children exposed to radiation (including in utero) show dose-dependent IQ reductions. Schull (1997) documented this in children exposed during the atomic bombings. The threshold for measurable cognitive effects is around 100 mGy.'},
+    {name:'Extra digits / limb defects',strength:'moderate',note:'Birth defect rates, including polydactyly, are elevated in offspring of irradiated parents. The mechanism is mutation in the parent\'s sperm or egg cells before conception.'},
+    {name:'Vision disorders',strength:'strong',note:'Radiation cataracts are a well-known occupational hazard. The lens of the eye is particularly sensitive because its cells do not turn over, so damage accumulates. Cataracts appear at cumulative doses above about 0.5 Gy. The ICRP lowered its recommended lens dose limit in 2012.'},
+    {name:'Reproductive issues',strength:'strong',note:'Radiation damages eggs and sperm, reducing fertility, increasing miscarriage risk, and raising the rate of birth defects in offspring. Documented in every major radiation-exposed population studied.'},
+    {name:'Spina bifida',strength:'moderate',note:'Neural tube defects are elevated in regions with high background radiation and in offspring of irradiated parents. Padmanabhan (2006) reviewed the animal and human evidence.'},
+    {name:'TSC / NF (de novo mutations)',strength:'emerging',note:'Radiation increases the rate of new (de novo) mutations across the genome. TSC2 and NF1 are both large genes, making them bigger targets for random mutations. A parent whose sperm or egg DNA has been damaged by occupational radiation exposure has a higher chance of passing a new TSC2 or NF1 mutation to their child.'},
+  ]},
+  {id:'rf',short:'Hydrazine / UDMH (Rocket Fuel)',mechanism:'Alkylating agents that stick small chemical groups (methyl groups) onto DNA bases, causing them to mispair during copying. A G that should pair with C pairs with T instead, and the wrong letter gets locked into the sequence permanently. UDMH (unsymmetrical dimethylhydrazine) is metabolized into methyldiazonium ion, one of the most potent DNA-alkylating compounds known.',targets:[
+    {name:'Brain tumors',strength:'moderate',note:'UDMH (unsymmetrical dimethylhydrazine) produces brain tumors in rodents at relatively low doses. Toth (1977) published these findings. Human epidemiological data is limited because workplace exposure records at aerospace facilities were often poorly maintained.'},
+    {name:'Reproductive issues',strength:'moderate',note:'Hydrazine and its derivatives are toxic to reproductive cells. Studies of workers at rocket engine facilities (including Rocketdyne) documented elevated rates of miscarriage. Hydrazine crosses the placenta.'},
+    {name:'Extra digits / limb defects',strength:'moderate',note:'Hydrazine is teratogenic in animal models, causing limb bud malformations when exposure occurs during the window of limb development.'},
+    {name:'Mental / cognitive',strength:'emerging',note:'The brain is a target organ for hydrazine toxicity. At high acute doses, hydrazine causes seizures and encephalopathy. Effects on brain development in offspring of exposed workers have not been well studied.'},
+    {name:'Spina bifida',strength:'emerging',note:'Rodent embryos exposed to hydrazine during neural tube closure develop neural tube defects. No large human study exists.'},
+    {name:'Polycystic kidney disease',strength:'emerging',note:'The kidney is one of the primary organs where hydrazine is metabolized, exposing kidney cells to high local concentrations of reactive alkylating intermediates. Chronic exposure in animal studies produces cystic changes in the kidneys.'},
+  ]},
+];
+const strengthColor={strong:'#E24B4A',moderate:'#BA7517',emerging:'#378ADD'};
+const strengthLabels={strong:'Strong evidence',moderate:'Moderate evidence',emerging:'Emerging / limited'};
+const svg2=document.getElementById('exp');
+const tabs2=document.getElementById('tabs2');
+const mechDiv=document.getElementById('mech-desc');
+const ns='http://www.w3.org/2000/svg';
+exposures.forEach(exp=>{
+  const btn=document.createElement('button');btn.textContent=exp.short;
+  btn.addEventListener('click',()=>showExposure(exp.id));tabs2.appendChild(btn);
+});
+function showExposure(id){
+  const exp=exposures.find(e=>e.id===id);
+  tabs2.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('active',exposures[i].id===id));
+  while(svg2.children.length>1)svg2.removeChild(svg2.lastChild);
+  mechDiv.innerHTML='<b>Mechanism:</b> '+exp.mechanism;
+  const centerY=220;
+  const srcR=document.createElementNS(ns,'rect');
+  srcR.setAttribute('x',20);srcR.setAttribute('y',centerY-30);srcR.setAttribute('width',240);srcR.setAttribute('height',60);
+  srcR.setAttribute('rx',8);srcR.setAttribute('fill','#E24B4A');srcR.setAttribute('opacity','0.15');
+  srcR.setAttribute('stroke','#E24B4A');srcR.setAttribute('stroke-width','1');svg2.appendChild(srcR);
+  const srcT=document.createElementNS(ns,'text');srcT.setAttribute('x',140);srcT.setAttribute('y',centerY);
+  srcT.setAttribute('text-anchor','middle');srcT.setAttribute('dominant-baseline','central');
+  srcT.setAttribute('fill','var(--text-primary)');srcT.setAttribute('font-size','11px');srcT.setAttribute('font-weight','500');
+  srcT.setAttribute('font-family','var(--font)');srcT.textContent=exp.short;svg2.appendChild(srcT);
+  const targets=exp.targets;const startY=30;const gapY=Math.min(50,400/targets.length);const targetX=440;
+  targets.forEach((t,i)=>{
+    const ty=startY+i*gapY+gapY/2;
+    const line=document.createElementNS(ns,'path');const midX=320;
+    line.setAttribute('d',`M260 ${centerY} C${midX} ${centerY} ${midX} ${ty} ${targetX-10} ${ty}`);
+    line.setAttribute('fill','none');line.setAttribute('stroke',strengthColor[t.strength]);
+    line.setAttribute('stroke-width',t.strength==='strong'?'2':t.strength==='moderate'?'1.2':'0.8');
+    line.setAttribute('opacity',t.strength==='strong'?'0.6':t.strength==='moderate'?'0.4':'0.25');
+    line.setAttribute('marker-end','url(#arrow2)');line.style.cursor='pointer';
+    line.style.transition='opacity 0.15s, stroke-width 0.15s';
+    line.addEventListener('mouseenter',()=>{line.setAttribute('opacity','0.9');line.setAttribute('stroke-width','2.5');});
+    line.addEventListener('mouseleave',()=>{line.setAttribute('opacity',t.strength==='strong'?'0.6':t.strength==='moderate'?'0.4':'0.25');line.setAttribute('stroke-width',t.strength==='strong'?'2':t.strength==='moderate'?'1.2':'0.8');});
+    line.addEventListener('click',()=>{document.getElementById('info2').innerHTML=`<b>${exp.short} and ${t.name}</b> <span class="strength str-${t.strength}">${strengthLabels[t.strength]}</span><br>${t.note}`;});
+    svg2.appendChild(line);
+    const tg=document.createElementNS(ns,'g');tg.style.cursor='pointer';
+    tg.addEventListener('click',()=>{document.getElementById('info2').innerHTML=`<b>${exp.short} and ${t.name}</b> <span class="strength str-${t.strength}">${strengthLabels[t.strength]}</span><br>${t.note}`;});
+    const dot=document.createElementNS(ns,'circle');dot.setAttribute('cx',targetX);dot.setAttribute('cy',ty);dot.setAttribute('r','4');
+    dot.setAttribute('fill',strengthColor[t.strength]);dot.setAttribute('opacity','0.6');tg.appendChild(dot);
+    const label=document.createElementNS(ns,'text');label.setAttribute('x',targetX+12);label.setAttribute('y',ty);
+    label.setAttribute('dominant-baseline','central');label.setAttribute('fill','var(--text-primary)');
+    label.setAttribute('font-size','12px');label.setAttribute('font-family','var(--font)');label.textContent=t.name;tg.appendChild(label);
+    svg2.appendChild(tg);
+  });
+}
+showExposure('ao');
+})();
+</script>
+</body>
+</html>
