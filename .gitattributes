@@ -1,0 +1,21 @@
+# Normalize line endings and pin source encoding.
+# src/index.html previously acquired a UTF-8 BOM and mojibake from an editor
+# that re-saved it as Windows-1252. This stops that recurring.
+* text=auto eol=lf
+
+*.html  text eol=lf working-tree-encoding=UTF-8
+*.css   text eol=lf working-tree-encoding=UTF-8
+*.js    text eol=lf working-tree-encoding=UTF-8
+*.md    text eol=lf working-tree-encoding=UTF-8
+*.json  text eol=lf
+*.xml   text eol=lf
+*.txt   text eol=lf
+*.cff   text eol=lf
+*.yml   text eol=lf
+
+*.png   binary
+*.svg   text eol=lf
+
+# Keep generated output out of diffs and language stats.
+dist/**            linguist-generated=true
+.github/assets/**  linguist-generated=true

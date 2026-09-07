@@ -1,0 +1,51 @@
+cff-version: 1.2.0
+title: >-
+  Compounding heritable genetic disorders of military toxicant
+  exposure: an interactive evidence map
+message: >-
+  If you use this work, or cite the connections it maps, please
+  cite it as below.
+type: dataset
+authors:
+  - given-names: Daniel
+    family-names: Trujillo
+    name-particle: Joaquin
+    affiliation: GANTASMO
+    city: Las Vegas
+    region: Nevada
+    country: US
+repository-code: >-
+  https://github.com/danieljtrujillo/military-chemical-exposure-and-multigenerational-genotoxic-compounding
+url: >-
+  https://danieljtrujillo.github.io/military-chemical-exposure-and-multigenerational-genotoxic-compounding/
+abstract: >-
+  An interactive, cited map of the relationships between military
+  and industrial toxicant exposure and heritable disease across
+  generations. Six exposures (dioxin/TCDD, hexavalent chromium,
+  ammonium perchlorate, naturally occurring asbestos, ionizing
+  radiation, and hydrazine/UDMH) are linked to fifteen conditions
+  through shared molecular pathways, with every exposure-to-disease
+  link graded for evidence strength against published literature.
+  Includes mechanisms of mutagenesis, transgenerational epigenetic
+  inheritance, treatment options, and United States legal and
+  financial resources for affected families.
+keywords:
+  - toxic exposure
+  - genotoxicity
+  - transgenerational epigenetic inheritance
+  - Agent Orange
+  - dioxin
+  - hexavalent chromium
+  - ammonium perchlorate
+  - hydrazine
+  - ionizing radiation
+  - asbestos
+  - tuberous sclerosis
+  - neurofibromatosis
+  - polycystic kidney disease
+  - spina bifida
+  - veterans health
+  - PACT Act
+  - occupational health
+  - data visualization
+license: MIT

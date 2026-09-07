@@ -1,0 +1,61 @@
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Allow one concurrent deployment; let an in-progress run finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check syntax
+        run: node --check src/script.js
+
+      - name: Data integrity
+        run: node tools/test-data.js
+
+      - name: Build
+        run: node tools/build.js
+
+      - name: Check the build is in sync with src/
+        run: |
+          if [ -n "$(git status --porcelain dist/)" ]; then
+            echo "::warning::dist/ differs from a fresh build. Run 'node tools/build.js' and commit."
+            git --no-pager diff --stat dist/
+          fi
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    # Only publish from main; pull requests stop after the build checks.
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

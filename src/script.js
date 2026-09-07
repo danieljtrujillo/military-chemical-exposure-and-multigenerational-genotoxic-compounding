@@ -79,11 +79,20 @@ function loop() {
 
 canvas = document.getElementById('c');
 var resize = function() {
-    canvasWidth = canvas.width = window.innerWidth;
-    canvasHeight = canvas.height = window.innerHeight;
+    // Draw at device resolution, capped at 2x. Without this the particles are
+    // soft on every high-DPI display; uncapped, a 3x phone pays triple fill
+    // cost for a background nobody is looking at directly.
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvasWidth = window.innerWidth;
+    canvasHeight = window.innerHeight;
+    canvas.width = Math.round(canvasWidth * dpr);
+    canvas.height = Math.round(canvasHeight * dpr);
+    canvas.style.width = canvasWidth + 'px';
+    canvas.style.height = canvasHeight + 'px';
     centerX = canvasWidth * 0.5;
     centerY = canvasHeight * 0.5;
     context = canvas.getContext('2d');
+    context.setTransform(dpr, 0, 0, dpr, 0, 0);
 };
 window.addEventListener('resize', resize);
 resize();
@@ -101,7 +110,34 @@ document.addEventListener('mousemove', function(e) {
     mouseY = e.clientY;
 }, false);
 
-setInterval(loop, 1000 / 60);
+// Respect the visitor's motion preference: never start the animation for
+// anyone who has asked the OS to reduce motion (CSS also hides the canvas).
+var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+var rafId = null;
+
+function tick() {
+    loop();
+    rafId = window.requestAnimationFrame(tick);
+}
+function start() {
+    if (rafId === null && !(reduceMotion && reduceMotion.matches) && !document.hidden) {
+        rafId = window.requestAnimationFrame(tick);
+    }
+}
+function stop() {
+    if (rafId !== null) { window.cancelAnimationFrame(rafId); rafId = null; }
+}
+
+// Don't burn CPU or battery painting a starfield nobody is looking at.
+document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { stop(); } else { start(); }
+});
+if (reduceMotion && reduceMotion.addEventListener) {
+    reduceMotion.addEventListener('change', function () {
+        if (reduceMotion.matches) { stop(); } else { start(); }
+    });
+}
+start();
 })();
 
 
@@ -122,6 +158,7 @@ const nodes = [
   {id:'mental', label:'Mental/cognitive', x:540, y:360, r:20, cat:'neuro', sub:'Depression, anxiety, ASD, ADHD', desc:'Mental and cognitive conditions in this context include depression, anxiety, attention deficit hyperactivity disorder (ADHD), autism spectrum disorder (ASD), intellectual disability, and executive function deficits. These are not separate coincidences but downstream effects of the same genetic and exposure-related damage. TSC disrupts synaptic pruning via mTOR, causing ASD and intellectual disability. NF1 disrupts dopamine signaling, causing ADHD and learning disabilities. White matter damage from radiation, thyroid deficiency, or hydrocephalus impairs processing speed and executive function. Chronic pain and inflammation from endometriosis, arthritis, or pseudotumor cerebri drive depression and anxiety.'},
   {id:'vision', label:'Vision disorders', x:560, y:160, r:18, cat:'neuro', sub:'Optic gliomas, papilledema', desc:'Vision disorders in this context include optic pathway gliomas (tumors on the optic nerve, common in NF1), papilledema (swelling of the optic disc from raised brain pressure, the hallmark of pseudotumor cerebri), retinal hamartomas (benign retinal tumors in TSC), Lisch nodules (iris hamartomas in NF1), radiation cataracts (clouding of the lens from cumulative radiation exposure), and visual field loss from brain tumors compressing the visual pathways. Any combination of these can occur in the same person, and each has a different cause requiring different treatment.'},
   {id:'repro', label:'Reproductive issues', x:300, y:480, r:18, cat:'inflammatory', sub:'Infertility, hormonal', desc:'Reproductive issues here include infertility (from endometriosis, hormonal disruption, or gonadal damage from radiation/chemicals), recurrent miscarriage (from dioxin exposure, thyroid dysfunction, or chromosomal abnormalities in damaged sperm/eggs), menstrual irregularity (from thyroid suppression by perchlorate or estrogen disruption by dioxin), reduced sperm count and quality (from chromium, radiation, and hydrazine exposure), and complications in pregnancy for women with spina bifida (high-risk obstetric management required). The damage can originate in either the exposed person or their unexposed partner who inherited damaged DNA.'},
+  {id:'thyroid', label:'Thyroid dysfunction', x:452, y:296, r:17, cat:'endocrine', desc:'Thyroid dysfunction covers an underactive thyroid (hypothyroidism), autoimmune thyroid disease (Hashimoto’s), and thyroid nodules or cancer. The gland concentrates iodine to build thyroid hormone, which makes it uniquely vulnerable to two of the exposures on this page: ammonium perchlorate blocks iodine uptake at the transporter, and radioactive iodine delivers a concentrated radiation dose to the tissue that absorbs it. During pregnancy the consequences fall on the fetus rather than the mother. Fetal brain development depends on maternal thyroid hormone through the first trimester, before the fetal thyroid is working at all. Insufficient hormone during that window impairs neuronal migration, myelination of white matter, and neural tube closure. A mother can have thyroid suppression mild enough to go undiagnosed and still deliver a child with measurable developmental effects.'},
   {id:'digits', label:'Extra digits/limbs', x:80, y:440, r:16, cat:'structural', sub:'Polydactyly', desc:'Polydactyly (extra fingers or toes) and other limb malformations result from disruption of the signaling pathways that pattern the developing limb during weeks 4-8 of pregnancy. The Sonic Hedgehog and Wnt pathways determine how many fingers form and where. Dioxin, radiation, hydrazine, and chromium all interfere with these pathways through direct DNA mutation or disrupted gene regulation. Polydactyly also co-occurs with neural tube defects in several genetic syndromes (Meckel-Gruber, Smith-Lemli-Opitz, trisomy 13). It is visible at birth and should trigger genetic evaluation when a parent has occupational toxic exposure history.'},
 ];
 const pathways = {
@@ -166,10 +203,27 @@ const edges = [
   {from:'endo',to:'pkd',path:'mtor',info:'This is a newer finding. The mTOR signaling pathway is overactive in both endometriotic tissue and in the cells lining kidney cysts in PKD. Drugs called rapamycin analogs (everolimus, sirolimus) have been studied for both conditions because they block mTOR. The clinical overlap between endometriosis and PKD in the same families has been noted but not yet studied in a large cohort.'},
   {from:'brain',to:'vision',path:'phako',info:'Brain tumors, especially those in the back of the brain (posterior fossa) or along the optic pathway, can compress the nerves and tracts that carry visual information. Separately, any brain tumor that raises intracranial pressure causes papilledema, which damages vision through the same mechanism described under pseudotumor cerebri.'},
   {from:'brain',to:'mental',path:'neural',info:'The cognitive effects of brain tumors depend on location and treatment. Frontal lobe tumors affect planning, judgment, and personality. Temporal lobe tumors affect memory and language. Chemotherapy and radiation used to treat brain tumors cause their own long-term damage to white matter, producing lasting problems with processing speed and memory even after the tumor is gone.'},
+  {from:'thyroid',to:'wm',path:'endocrine',info:'Thyroid hormone drives myelination — the process that wraps nerve fibres in the fatty insulation that makes up white matter. The fetus cannot make its own thyroid hormone until roughly week 16 and depends entirely on the mother until then. Maternal hypothyroidism during that window produces measurable white matter abnormalities and reduced processing speed in the child. Perchlorate exposure suppresses maternal thyroid function through exactly this window (Zoeller & Rovet, 2004).'},
+  {from:'thyroid',to:'spina',path:'endocrine',info:'Neural tube closure happens between days 21 and 28 of gestation, often before a pregnancy is confirmed. The process depends on adequate thyroid hormone and adequate folate. Thyroid hormone regulates the genes controlling neural crest cell migration; when it is insufficient, closure can fail, producing spina bifida or anencephaly. This is the mechanism by which a chemical that never touches DNA — perchlorate — produces a structural birth defect (Zoeller & Rovet, 2004).'},
+  {from:'thyroid',to:'mental',path:'endocrine',info:'Maternal thyroid hormone deficiency in the first trimester is associated with lower IQ in the child, and the effect is dose-dependent. Haddow et al. (1999) found children of untreated hypothyroid mothers scored on average 7 IQ points lower than controls. Attention deficits and language delay are also elevated. The damage is done before birth and is not reversed by treating the child’s thyroid afterwards.'},
+  {from:'thyroid',to:'repro',path:'endocrine',info:'Thyroid dysfunction disrupts the menstrual cycle, impairs ovulation, and raises miscarriage risk. Both hypothyroidism and autoimmune thyroid disease are over-represented in women investigated for infertility and recurrent pregnancy loss. Because thyroid antibodies raise miscarriage risk even when hormone levels look normal, antibody testing is worth requesting alongside a standard thyroid panel.'},
+  {from:'thyroid',to:'endo',path:'endocrine',info:'Autoimmune thyroid disease and endometriosis co-occur more often than chance. Both are estrogen-responsive inflammatory conditions, and both are elevated in dioxin-exposed populations. Sinaii et al. (2002) found hypothyroidism reported at more than seven times the expected rate among women with endometriosis in a large survey.'},
 ];
-const catColors = {genetic:'#7F77DD', neoplastic:'#E24B4A', neuro:'#378ADD', structural:'#888780', inflammatory:'#D4537E'};
+const catColors = {genetic:'#7F77DD', neoplastic:'#E24B4A', neuro:'#378ADD', structural:'#888780', inflammatory:'#D4537E', endocrine:'#BA7517'};
 const svg = document.getElementById('net');
 const ns = 'http://www.w3.org/2000/svg';
+// SVG shapes are not focusable by default. Give every interactive shape a tab
+// stop, an accessible name, and Enter/Space activation so the diagram is usable
+// without a mouse.
+function makeOperable(el, label, activate){
+  el.setAttribute('tabindex','0');
+  el.setAttribute('role','button');
+  el.setAttribute('aria-label',label);
+  el.addEventListener('click', activate);
+  el.addEventListener('keydown', ev => {
+    if(ev.key==='Enter'||ev.key===' '||ev.key==='Spacebar'){ ev.preventDefault(); activate(); }
+  });
+}
 let activePathway = null;
 const edgeEls = [];
 edges.forEach((e,i) => {
@@ -185,12 +239,16 @@ edges.forEach((e,i) => {
   line.setAttribute('stroke-width','1.5'); line.setAttribute('opacity','0.5');
   line.setAttribute('stroke-linecap','round'); line.style.cursor='pointer';
   line.style.transition='opacity 0.2s, stroke-width 0.2s';
-  line.addEventListener('click',()=>{
-    const nn1=nodes.find(n=>n.id===e.from).label, nn2=nodes.find(n=>n.id===e.to).label;
+  const nn1=nodes.find(n=>n.id===e.from).label, nn2=nodes.find(n=>n.id===e.to).label;
+  makeOperable(line, `Evidence linking ${nn1} and ${nn2} via ${pathways[e.path].label}`, ()=>{
     document.getElementById('info1').innerHTML=`<div class="info-title">${nn1} and ${nn2} <span style="color:${pathways[e.path].color}">(${pathways[e.path].label})</span></div>${e.info}`;
   });
-  line.addEventListener('mouseenter',()=>{line.setAttribute('stroke-width','3');line.setAttribute('opacity','0.9');});
-  line.addEventListener('mouseleave',()=>{line.setAttribute('stroke-width',activePathway&&e.path!==activePathway?'0.5':'1.5');line.setAttribute('opacity',activePathway&&e.path!==activePathway?'0.1':'0.5');});
+  const emphasize=()=>{line.setAttribute('stroke-width','3');line.setAttribute('opacity','0.9');};
+  line.addEventListener('mouseenter',emphasize);
+  line.addEventListener('focus',emphasize);
+  const relax=()=>{line.setAttribute('stroke-width',activePathway&&e.path!==activePathway?'0.5':'1.5');line.setAttribute('opacity',activePathway&&e.path!==activePathway?'0.1':'0.5');};
+  line.addEventListener('mouseleave',relax);
+  line.addEventListener('blur',relax);
   svg.appendChild(line); edgeEls.push({el:line,data:e});
 });
 nodes.forEach(n=>{
@@ -204,18 +262,85 @@ nodes.forEach(n=>{
   t.setAttribute('x',n.x);t.setAttribute('y',n.y+n.r+14);t.setAttribute('text-anchor','middle');
   t.classList.add('node-label');t.textContent=n.label;g.appendChild(t);
   if(n.sub){const ts=document.createElementNS(ns,'text');ts.setAttribute('x',n.x);ts.setAttribute('y',n.y+n.r+26);ts.setAttribute('text-anchor','middle');ts.classList.add('node-sublabel');ts.textContent=n.sub;g.appendChild(ts);}
-  g.addEventListener('click',()=>{
+  makeOperable(g, `${n.label}: description and connected conditions`, ()=>{
     const conns=edges.filter(e=>e.from===n.id||e.to===n.id);
     const partners=conns.map(e=>{const o=e.from===n.id?e.to:e.from;return nodes.find(nd=>nd.id===o).label;});
     document.getElementById('info1').innerHTML=`<div class="info-title">${n.label}${n.sub?' ('+n.sub+')':''}</div><p style="margin:6px 0 8px">${n.desc}</p><b>Connected to ${conns.length} other conditions:</b> ${partners.join(', ')}. Click any colored line for the research linking them.`;
   });
-  g.addEventListener('mouseenter',()=>circ.setAttribute('opacity','0.3'));
-  g.addEventListener('mouseleave',()=>circ.setAttribute('opacity','0.15'));
+  const lift=()=>circ.setAttribute('opacity','0.3');
+  const settle=()=>circ.setAttribute('opacity','0.15');
+  g.addEventListener('mouseenter',lift); g.addEventListener('focus',lift);
+  g.addEventListener('mouseleave',settle); g.addEventListener('blur',settle);
   svg.appendChild(g);
 });
+// ---------------------------------------------------------------------------
+// Text view of the network.
+//
+// At 375px the SVG scales its 680px viewBox down to ~312px, which renders the
+// 11px node labels at about 5px - unreadable. Rather than shrink the diagram
+// further, narrow screens get this list instead. It carries exactly the same
+// data, it is what a screen reader reads, and unlike the SVG it is text a
+// search engine can index.
+// ---------------------------------------------------------------------------
+const catLabels={genetic:'Genetic',neoplastic:'Neoplastic',neuro:'Brain and nerve',structural:'Structural',inflammatory:'Inflammatory',endocrine:'Endocrine'};
+const netList=document.getElementById('net-list');
+if(netList){
+  nodes.forEach(n=>{
+    const conns=edges.filter(e=>e.from===n.id||e.to===n.id);
+    const d=document.createElement('details');
+    d.className='accord net-list-item';
+    d.id='condition-'+n.id;
+
+    const s=document.createElement('summary');
+    s.innerHTML=`<span><span class="dot" style="background:${catColors[n.cat]}"></span>${n.label}</span>`;
+    d.appendChild(s);
+
+    const body=document.createElement('div');
+    body.className='accord-body prose';
+    const desc=document.createElement('p');
+    desc.textContent=n.desc;
+    body.appendChild(desc);
+
+    const h=document.createElement('p');
+    h.className='net-list-cat';
+    h.textContent=`${catLabels[n.cat]||n.cat} · connected to ${conns.length} other condition${conns.length===1?'':'s'}`;
+    body.appendChild(h);
+
+    const ul=document.createElement('ul');
+    ul.className='net-list-links';
+    conns.forEach(e=>{
+      const otherId=e.from===n.id?e.to:e.from;
+      const other=nodes.find(nd=>nd.id===otherId);
+      const li=document.createElement('li');
+      li.innerHTML=`<a href="#condition-${otherId}"><b>${other.label}</b></a> <span class="pathway-tag" style="color:${pathways[e.path].color}">${pathways[e.path].label}</span><br>${e.info}`;
+      ul.appendChild(li);
+    });
+    body.appendChild(ul);
+    d.appendChild(body);
+    netList.appendChild(d);
+  });
+}
+
+// Narrow screens get the list; wide screens get the diagram with the list
+// available underneath as a text alternative.
+const narrow=window.matchMedia('(max-width: 700px)');
+function applyView(){
+  const isNarrow=narrow.matches;
+  const fig=document.getElementById('fig-network');
+  if(fig)fig.classList.toggle('is-narrow',isNarrow);
+  if(netList&&isNarrow)netList.classList.add('is-primary');
+  else if(netList)netList.classList.remove('is-primary');
+}
+if(narrow.addEventListener)narrow.addEventListener('change',applyView);
+applyView();
+
 const leg=document.getElementById('legend1');
-Object.entries(pathways).forEach(([key,val])=>{
-  const d=document.createElement('div');d.className='legend-item';
+// Only offer a filter for pathways that actually connect something. A legend
+// entry with no edges renders as a control that blanks the whole graph.
+const usedPathways=new Set(edges.map(e=>e.path));
+Object.entries(pathways).filter(([key])=>usedPathways.has(key)).forEach(([key,val])=>{
+  const d=document.createElement('button');d.className='legend-item';
+  d.type='button'; d.setAttribute('aria-pressed','false');
   d.innerHTML=`<span class="legend-swatch" style="background:${val.color}"></span>${val.label}`;
   d.addEventListener('click',()=>{
     if(activePathway===key)activePathway=null;else activePathway=key;
@@ -224,8 +349,11 @@ Object.entries(pathways).forEach(([key,val])=>{
       else if(data.path===activePathway){el.setAttribute('opacity','0.7');el.setAttribute('stroke-width','2');}
       else{el.setAttribute('opacity','0.08');el.setAttribute('stroke-width','0.5');}
     });
-    leg.querySelectorAll('.legend-item').forEach(el=>el.classList.remove('dimmed'));
-    if(activePathway)leg.querySelectorAll('.legend-item').forEach(el=>{if(el!==d)el.classList.add('dimmed');});
+    leg.querySelectorAll('.legend-item').forEach(el=>{el.classList.remove('dimmed');el.setAttribute('aria-pressed','false');});
+    if(activePathway){
+      leg.querySelectorAll('.legend-item').forEach(el=>{if(el!==d)el.classList.add('dimmed');});
+      d.setAttribute('aria-pressed','true');
+    }
   });
   leg.appendChild(d);
 });
@@ -235,55 +363,71 @@ Object.entries(pathways).forEach(([key,val])=>{
 (function(){
 const exposures = [
   {id:'ao',short:'Agent Orange (Dioxin / TCDD)',mechanism:'Binds the AhR receptor inside cells, reprograms which genes are active, disrupts estrogen and androgen signaling, and creates DNA adducts. Effects can be transmitted to children and grandchildren through altered epigenetic tags on sperm DNA.',targets:[
-    {name:'Spina bifida',strength:'strong',note:'The VA recognizes spina bifida as a presumptive condition in children of Vietnam veterans exposed to Agent Orange. Multiple studies in Vietnamese and American populations confirmed elevated rates of neural tube defects in offspring of exposed individuals. Ngo et al. (2006) and the National Academies of Sciences (2018) both reviewed this evidence.'},
-    {name:'Brain tumors',strength:'moderate',note:'The link between dioxin and soft-tissue sarcomas and non-Hodgkin lymphoma is well established. Brain tumor risk is elevated in some exposed cohorts, though the evidence is less uniform. Hardell et al. (2007) found increased brain tumor rates in people with high dioxin exposure.'},
-    {name:'Endometriosis',strength:'strong',note:'Rier et al. (1993) exposed rhesus monkeys to TCDD (the most toxic dioxin in Agent Orange) and found dose-dependent endometriosis. Monkeys given higher doses developed worse disease. Human epidemiological studies support the same pattern. Dioxin activates inflammatory pathways and disrupts estrogen signaling, both of which promote endometrial tissue growth outside the uterus.'},
-    {name:'Extra digits / limb defects',strength:'moderate',note:'Increased rates of birth defects including extra fingers and toes have been documented in Vietnamese populations near spraying zones and in offspring of American veterans. Le and Johansson (2001) reviewed this evidence. Dioxin disrupts the Sonic Hedgehog and Wnt signaling pathways during limb development.'},
-    {name:'Mental / cognitive',strength:'moderate',note:'Children of exposed veterans and Vietnamese populations show elevated rates of neurodevelopmental problems. Dioxin disrupts thyroid hormone, which the fetal brain requires for normal development during the first and second trimesters.'},
-    {name:'Reproductive issues',strength:'strong',note:'The Ranch Hand study (following Air Force personnel who sprayed Agent Orange) documented reduced fertility, hormonal abnormalities, and increased miscarriage rates. Dioxin binds to estrogen and androgen pathways and disrupts ovulation, sperm production, and pregnancy maintenance.'},
-    {name:'Vision disorders',strength:'emerging',note:'Animal studies have shown retinal and optic nerve toxicity at high dioxin doses. Human data on vision-specific effects is limited, but the AhR receptor is expressed in retinal tissue.'},
-    {name:'Scoliosis',strength:'emerging',note:'Scoliosis appears in children of exposed veterans alongside spina bifida. It has not been isolated as an independent effect of dioxin separate from the neural tube defect pathway.'},
-    {name:'Polycystic kidney disease',strength:'emerging',note:'AhR activation affects kidney tubule development. The Wnt and mTOR pathways, both activated by dioxin through AhR, are also the pathways that go wrong in polycystic kidney disease. No large human study has tested this connection directly, but the biological plausibility is there.'},
+    {d:'spina',name:'Spina bifida',strength:'strong',note:'The VA recognizes spina bifida as a presumptive condition in children of Vietnam veterans exposed to Agent Orange. Multiple studies in Vietnamese and American populations confirmed elevated rates of neural tube defects in offspring of exposed individuals. Ngo et al. (2006) and the National Academies of Sciences (2018) both reviewed this evidence.'},
+    {d:'brain',name:'Brain tumors',strength:'moderate',note:'The link between dioxin and soft-tissue sarcomas and non-Hodgkin lymphoma is well established. Brain tumor risk is elevated in some exposed cohorts, though the evidence is less uniform. Hardell et al. (2007) found increased brain tumor rates in people with high dioxin exposure.'},
+    {d:'endo',name:'Endometriosis',strength:'strong',note:'Rier et al. (1993) exposed rhesus monkeys to TCDD (the most toxic dioxin in Agent Orange) and found dose-dependent endometriosis. Monkeys given higher doses developed worse disease. Human epidemiological studies support the same pattern. Dioxin activates inflammatory pathways and disrupts estrogen signaling, both of which promote endometrial tissue growth outside the uterus.'},
+    {d:'digits',name:'Extra digits / limb defects',strength:'moderate',note:'Increased rates of birth defects including extra fingers and toes have been documented in Vietnamese populations near spraying zones and in offspring of American veterans. Le and Johansson (2001) reviewed this evidence. Dioxin disrupts the Sonic Hedgehog and Wnt signaling pathways during limb development.'},
+    {d:'mental',name:'Mental / cognitive',strength:'moderate',note:'Children of exposed veterans and Vietnamese populations show elevated rates of neurodevelopmental problems. Dioxin disrupts thyroid hormone, which the fetal brain requires for normal development during the first and second trimesters.'},
+    {d:'repro',name:'Reproductive issues',strength:'strong',note:'The Ranch Hand study (following Air Force personnel who sprayed Agent Orange) documented reduced fertility, hormonal abnormalities, and increased miscarriage rates. Dioxin binds to estrogen and androgen pathways and disrupts ovulation, sperm production, and pregnancy maintenance.'},
+    {d:'vision',name:'Vision disorders',strength:'emerging',note:'Animal studies have shown retinal and optic nerve toxicity at high dioxin doses. Human data on vision-specific effects is limited, but the AhR receptor is expressed in retinal tissue.'},
+    {d:'scoli',name:'Scoliosis',strength:'emerging',note:'Scoliosis appears in children of exposed veterans alongside spina bifida. It has not been isolated as an independent effect of dioxin separate from the neural tube defect pathway.'},
+    {d:'pkd',name:'Polycystic kidney disease',strength:'emerging',note:'AhR activation affects kidney tubule development. The Wnt and mTOR pathways, both activated by dioxin through AhR, are also the pathways that go wrong in polycystic kidney disease. No large human study has tested this connection directly, but the biological plausibility is there.'},
   ]},
   {id:'cr6',short:'Hexavalent Chromium (Cr VI)',mechanism:'Enters cells disguised as sulfate through the same transporter, then gets reduced inside the cell into reactive chromium ions that physically crosslink DNA strands. The cell\'s repair machinery makes errors trying to fix the crosslinks, and those errors become permanent mutations.',targets:[
-    {name:'Brain tumors',strength:'moderate',note:'Workers exposed to hexavalent chromium show elevated rates of brain and CNS tumors. Gibb et al. (2015) documented this in a large occupational cohort. Hexavalent chromium can cross the blood-brain barrier because it enters cells through the same sulfate transporter found in brain tissue.'},
-    {name:'Reproductive issues',strength:'strong',note:'Men exposed to hexavalent chromium have reduced sperm counts and more abnormal sperm. Women living near chromium waste sites have higher rates of miscarriage and stillbirth. Li et al. (2001) and Kumar and Sagar (2020) reviewed this evidence.'},
-    {name:'Extra digits / limb defects',strength:'moderate',note:'Hexavalent chromium is teratogenic in animal studies. Clusters of birth defects have been documented near chromium waste disposal sites in India (Sharma et al., 2012).'},
-    {name:'Mental / cognitive',strength:'emerging',note:'Hexavalent chromium causes oxidative damage to nerve tissue. Workers chronically exposed show measurable cognitive deficits compared to unexposed controls (Kuo et al., 2018).'},
-    {name:'Arthritis',strength:'emerging',note:'Hexavalent chromium triggers inflammatory cascades through oxidative stress. Workers with chronic exposure report joint pain and stiffness at rates above the general population.'},
+    {d:'brain',name:'Brain tumors',strength:'moderate',note:'Workers exposed to hexavalent chromium show elevated rates of brain and CNS tumors. Gibb et al. (2015) documented this in a large occupational cohort. Hexavalent chromium can cross the blood-brain barrier because it enters cells through the same sulfate transporter found in brain tissue.'},
+    {d:'repro',name:'Reproductive issues',strength:'strong',note:'Men exposed to hexavalent chromium have reduced sperm counts and more abnormal sperm. Women living near chromium waste sites have higher rates of miscarriage and stillbirth. Li et al. (2001) and Kumar and Sagar (2020) reviewed this evidence.'},
+    {d:'digits',name:'Extra digits / limb defects',strength:'moderate',note:'Hexavalent chromium is teratogenic in animal studies. Clusters of birth defects have been documented near chromium waste disposal sites in India (Sharma et al., 2012).'},
+    {d:'mental',name:'Mental / cognitive',strength:'emerging',note:'Hexavalent chromium causes oxidative damage to nerve tissue. Workers chronically exposed show measurable cognitive deficits compared to unexposed controls (Kuo et al., 2018).'},
+    {d:'arth',name:'Arthritis',strength:'emerging',note:'Hexavalent chromium triggers inflammatory cascades through oxidative stress. Workers with chronic exposure report joint pain and stiffness at rates above the general population.'},
   ]},
   {id:'ap',short:'Ammonium Perchlorate',mechanism:'Blocks the sodium-iodide symporter (NIS) in the thyroid gland, preventing iodine uptake. Without iodine, the thyroid cannot produce thyroid hormone. During pregnancy, fetal brain development and neural tube closure both depend on adequate thyroid hormone from the mother.',targets:[
-    {name:'Mental / cognitive',strength:'strong',note:'The fetal brain requires thyroid hormone to develop normally, especially during the first trimester. Ammonium perchlorate blocks thyroid hormone production by jamming the iodine transporter. Korevaar et al. (2016) showed that even mild maternal thyroid underfunction during early pregnancy is associated with lower IQ and higher rates of ADHD in the child.'},
-    {name:'Reproductive issues',strength:'strong',note:'Thyroid hormone regulates ovulation, uterine lining development, and pregnancy maintenance. Women with thyroid suppression from ammonium perchlorate exposure experience irregular periods, difficulty conceiving, and higher miscarriage rates.'},
-    {name:'Spina bifida',strength:'moderate',note:'Thyroid hormone is involved in neural tube closure during weeks 3-4 of pregnancy. Maternal hypothyroxinemia (low thyroid hormone despite normal TSH) during this window increases the risk of neural tube defects.'},
-    {name:'White matter disease',strength:'moderate',note:'Myelin (the insulation on nerve fibers that makes up white matter) requires thyroid hormone for its production. Oligodendrocytes, the cells that make myelin, do not mature properly without thyroid signaling. Zoeller and Rovet (2004) reviewed this evidence.'},
-    {name:'Degenerative disk disease',strength:'emerging',note:'Thyroid hormone regulates cartilage metabolism. Animal models of hypothyroidism show accelerated disk degeneration. No human study has directly linked ammonium perchlorate exposure to disk disease.'},
-    {name:'Scoliosis',strength:'emerging',note:'Thyroid disruption during skeletal development could affect vertebral formation, and the neural tube effects of ammonium perchlorate are a known risk factor for congenital scoliosis.'},
+    {d:'mental',name:'Mental / cognitive',strength:'strong',note:'The fetal brain requires thyroid hormone to develop normally, especially during the first trimester. Ammonium perchlorate blocks thyroid hormone production by jamming the iodine transporter. Korevaar et al. (2016) showed that even mild maternal thyroid underfunction during early pregnancy is associated with lower IQ and higher rates of ADHD in the child.'},
+    {d:'repro',name:'Reproductive issues',strength:'strong',note:'Thyroid hormone regulates ovulation, uterine lining development, and pregnancy maintenance. Women with thyroid suppression from ammonium perchlorate exposure experience irregular periods, difficulty conceiving, and higher miscarriage rates.'},
+    {d:'spina',name:'Spina bifida',strength:'moderate',note:'Thyroid hormone is involved in neural tube closure during weeks 3-4 of pregnancy. Maternal hypothyroxinemia (low thyroid hormone despite normal TSH) during this window increases the risk of neural tube defects.'},
+    {d:'wm',name:'White matter disease',strength:'moderate',note:'Myelin (the insulation on nerve fibers that makes up white matter) requires thyroid hormone for its production. Oligodendrocytes, the cells that make myelin, do not mature properly without thyroid signaling. Zoeller and Rovet (2004) reviewed this evidence.'},
+    {d:'ddd',name:'Degenerative disk disease',strength:'emerging',note:'Thyroid hormone regulates cartilage metabolism. Animal models of hypothyroidism show accelerated disk degeneration. No human study has directly linked ammonium perchlorate exposure to disk disease.'},
+    {d:'scoli',name:'Scoliosis',strength:'emerging',note:'Thyroid disruption during skeletal development could affect vertebral formation, and the neural tube effects of ammonium perchlorate are a known risk factor for congenital scoliosis.'},
   ]},
   {id:'asb',short:'Naturally Occurring Asbestos',mechanism:'Microscopic mineral fibers small enough to penetrate individual cells. Once inside, the body cannot break them down. The immune response to stuck fibers produces a continuous flood of free radicals that damage nearby DNA for months and years. The NF-kB inflammatory pathway stays permanently switched on.',targets:[
-    {name:'Brain tumors',strength:'emerging',note:'Asbestos is an established cause of mesothelioma and lung cancer. The link to brain tumors is weaker. Some occupational cohort studies (Boffetta et al., 2014) show a small elevation in CNS tumor rates among asbestos-exposed workers.'},
-    {name:'Arthritis',strength:'moderate',note:'People exposed to asbestos develop elevated levels of autoimmune markers even before they develop any lung disease. Pfau et al. (2005) documented this in a community exposed to naturally occurring asbestos in Libby, Montana.'},
-    {name:'Endometriosis',strength:'emerging',note:'Asbestos activates the NF-kB inflammatory pathway, which is also overactive in endometriotic tissue. Populations with heavy asbestos exposure show higher rates of inflammatory gynecological conditions, though no study has measured endometriosis incidence specifically.'},
-    {name:'Reproductive issues',strength:'moderate',note:'Chronic inflammation from asbestos impairs fertility. Heller et al. (1996) documented that asbestos fibers can cross the placenta, meaning a pregnant woman exposed to asbestos passes fibers directly to the fetus.'},
+    {d:'brain',name:'Brain tumors',strength:'emerging',note:'Asbestos is an established cause of mesothelioma and lung cancer. The link to brain tumors is weaker. Some occupational cohort studies (Boffetta et al., 2014) show a small elevation in CNS tumor rates among asbestos-exposed workers.'},
+    {d:'arth',name:'Arthritis',strength:'moderate',note:'People exposed to asbestos develop elevated levels of autoimmune markers even before they develop any lung disease. Pfau et al. (2005) documented this in a community exposed to naturally occurring asbestos in Libby, Montana.'},
+    {d:'endo',name:'Endometriosis',strength:'emerging',note:'Asbestos activates the NF-kB inflammatory pathway, which is also overactive in endometriotic tissue. Populations with heavy asbestos exposure show higher rates of inflammatory gynecological conditions, though no study has measured endometriosis incidence specifically.'},
+    {d:'repro',name:'Reproductive issues',strength:'moderate',note:'Chronic inflammation from asbestos impairs fertility. Heller et al. (1996) documented that asbestos fibers can cross the placenta, meaning a pregnant woman exposed to asbestos passes fibers directly to the fetus.'},
   ]},
   {id:'rad',short:'Ionizing Radiation',mechanism:'Snaps DNA strands in two. A double-strand break (both rails of the DNA ladder cut at the same spot) is extremely difficult for the cell to repair correctly. Misrepaired breaks produce deletions, rearrangements, and point mutations. Radiation also generates free radicals that cause additional oxidative DNA damage. Sperm and egg cells can carry these mutations to the next generation.',targets:[
-    {name:'Brain tumors',strength:'strong',note:'The dose-response relationship between radiation and brain tumors is well established across atomic bomb survivors, Chernobyl liquidators, and nuclear industry workers. Preston et al. (2007) quantified this in a large study. Radiation breaks DNA strands, and misrepaired breaks in tumor-suppressor genes enable uncontrolled cell growth.'},
-    {name:'Polycystic kidney disease',strength:'emerging',note:'Irradiated rodents develop kidney cysts at higher rates than controls. The mechanism is likely radiation-induced mutation of genes involved in kidney tubule structure, including PKD1. Human data is limited to case reports.'},
-    {name:'White matter disease',strength:'strong',note:'Radiation leukoencephalopathy (white matter destruction from radiation) is well documented in people who received brain radiation and in people accidentally exposed to high doses. Fike et al. (2009) reviewed the pathology: radiation kills oligodendrocytes and damages the small blood vessels that supply white matter.'},
-    {name:'Mental / cognitive',strength:'strong',note:'Children exposed to radiation (including in utero) show dose-dependent IQ reductions. Schull (1997) documented this in children exposed during the atomic bombings. The threshold for measurable cognitive effects is around 100 mGy.'},
-    {name:'Extra digits / limb defects',strength:'moderate',note:'Birth defect rates, including polydactyly, are elevated in offspring of irradiated parents. The mechanism is mutation in the parent\'s sperm or egg cells before conception.'},
-    {name:'Vision disorders',strength:'strong',note:'Radiation cataracts are a well-known occupational hazard. The lens of the eye is particularly sensitive because its cells do not turn over, so damage accumulates. Cataracts appear at cumulative doses above about 0.5 Gy. The ICRP lowered its recommended lens dose limit in 2012.'},
-    {name:'Reproductive issues',strength:'strong',note:'Radiation damages eggs and sperm, reducing fertility, increasing miscarriage risk, and raising the rate of birth defects in offspring. Documented in every major radiation-exposed population studied.'},
-    {name:'Spina bifida',strength:'moderate',note:'Neural tube defects are elevated in regions with high background radiation and in offspring of irradiated parents. Padmanabhan (2006) reviewed the animal and human evidence.'},
-    {name:'TSC / NF (de novo mutations)',strength:'emerging',note:'Radiation increases the rate of new (de novo) mutations across the genome. TSC2 and NF1 are both large genes, making them bigger targets for random mutations. A parent whose sperm or egg DNA has been damaged by occupational radiation exposure has a higher chance of passing a new TSC2 or NF1 mutation to their child.'},
+    {d:'brain',name:'Brain tumors',strength:'strong',note:'The dose-response relationship between radiation and brain tumors is well established across atomic bomb survivors, Chernobyl liquidators, and nuclear industry workers. Preston et al. (2007) quantified this in a large study. Radiation breaks DNA strands, and misrepaired breaks in tumor-suppressor genes enable uncontrolled cell growth.'},
+    {d:'pkd',name:'Polycystic kidney disease',strength:'emerging',note:'Irradiated rodents develop kidney cysts at higher rates than controls. The mechanism is likely radiation-induced mutation of genes involved in kidney tubule structure, including PKD1. Human data is limited to case reports.'},
+    {d:'wm',name:'White matter disease',strength:'strong',note:'Radiation leukoencephalopathy (white matter destruction from radiation) is well documented in people who received brain radiation and in people accidentally exposed to high doses. Fike et al. (2009) reviewed the pathology: radiation kills oligodendrocytes and damages the small blood vessels that supply white matter.'},
+    {d:'mental',name:'Mental / cognitive',strength:'strong',note:'Children exposed to radiation (including in utero) show dose-dependent IQ reductions. Schull (1997) documented this in children exposed during the atomic bombings. The threshold for measurable cognitive effects is around 100 mGy.'},
+    {d:'digits',name:'Extra digits / limb defects',strength:'moderate',note:'Birth defect rates, including polydactyly, are elevated in offspring of irradiated parents. The mechanism is mutation in the parent\'s sperm or egg cells before conception.'},
+    {d:'vision',name:'Vision disorders',strength:'strong',note:'Radiation cataracts are a well-known occupational hazard. The lens of the eye is particularly sensitive because its cells do not turn over, so damage accumulates. Cataracts appear at cumulative doses above about 0.5 Gy. The ICRP lowered its recommended lens dose limit in 2012.'},
+    {d:'repro',name:'Reproductive issues',strength:'strong',note:'Radiation damages eggs and sperm, reducing fertility, increasing miscarriage risk, and raising the rate of birth defects in offspring. Documented in every major radiation-exposed population studied.'},
+    {d:'spina',name:'Spina bifida',strength:'moderate',note:'Neural tube defects are elevated in regions with high background radiation and in offspring of irradiated parents. Padmanabhan (2006) reviewed the animal and human evidence.'},
+    {d:'tsc',name:'TSC / NF (de novo mutations)',strength:'emerging',note:'Radiation increases the rate of new (de novo) mutations across the genome. TSC2 and NF1 are both large genes, making them bigger targets for random mutations. A parent whose sperm or egg DNA has been damaged by occupational radiation exposure has a higher chance of passing a new TSC2 or NF1 mutation to their child.'},
+    {d:'nf',name:'Neurofibromatosis (de novo mutations)',strength:'moderate',note:'About half of all NF1 cases are de novo, meaning the mutation is new in the child and present in neither parent. NF1 is a large gene with an unusually high spontaneous mutation rate, which makes it a sensitive target for anything that raises the background mutation rate in germ cells. Paternal age is an established risk factor for de novo NF1, consistent with mutations accumulating in sperm-producing cells over time; ionizing radiation acts on those same cells.'},
   ]},
   {id:'rf',short:'Hydrazine / UDMH (Rocket Fuel)',mechanism:'Alkylating agents that stick small chemical groups (methyl groups) onto DNA bases, causing them to mispair during copying. A G that should pair with C pairs with T instead, and the wrong letter gets locked into the sequence permanently. UDMH (unsymmetrical dimethylhydrazine) is metabolized into methyldiazonium ion, one of the most potent DNA-alkylating compounds known.',targets:[
-    {name:'Brain tumors',strength:'moderate',note:'UDMH (unsymmetrical dimethylhydrazine) produces brain tumors in rodents at relatively low doses. Toth (1977) published these findings. Human epidemiological data is limited because workplace exposure records at aerospace facilities were often poorly maintained.'},
-    {name:'Reproductive issues',strength:'moderate',note:'Hydrazine and its derivatives are toxic to reproductive cells. Studies of workers at rocket engine facilities (including Rocketdyne) documented elevated rates of miscarriage. Hydrazine crosses the placenta.'},
-    {name:'Extra digits / limb defects',strength:'moderate',note:'Hydrazine is teratogenic in animal models, causing limb bud malformations when exposure occurs during the window of limb development.'},
-    {name:'Mental / cognitive',strength:'emerging',note:'The brain is a target organ for hydrazine toxicity. At high acute doses, hydrazine causes seizures and encephalopathy. Effects on brain development in offspring of exposed workers have not been well studied.'},
-    {name:'Spina bifida',strength:'emerging',note:'Rodent embryos exposed to hydrazine during neural tube closure develop neural tube defects. No large human study exists.'},
-    {name:'Polycystic kidney disease',strength:'emerging',note:'The kidney is one of the primary organs where hydrazine is metabolized, exposing kidney cells to high local concentrations of reactive alkylating intermediates. Chronic exposure in animal studies produces cystic changes in the kidneys.'},
+    {d:'brain',name:'Brain tumors',strength:'moderate',note:'UDMH (unsymmetrical dimethylhydrazine) produces brain tumors in rodents at relatively low doses. Toth (1977) published these findings. Human epidemiological data is limited because workplace exposure records at aerospace facilities were often poorly maintained.'},
+    {d:'repro',name:'Reproductive issues',strength:'moderate',note:'Hydrazine and its derivatives are toxic to reproductive cells. Studies of workers at rocket engine facilities (including Rocketdyne) documented elevated rates of miscarriage. Hydrazine crosses the placenta.'},
+    {d:'digits',name:'Extra digits / limb defects',strength:'moderate',note:'Hydrazine is teratogenic in animal models, causing limb bud malformations when exposure occurs during the window of limb development.'},
+    {d:'mental',name:'Mental / cognitive',strength:'emerging',note:'The brain is a target organ for hydrazine toxicity. At high acute doses, hydrazine causes seizures and encephalopathy. Effects on brain development in offspring of exposed workers have not been well studied.'},
+    {d:'spina',name:'Spina bifida',strength:'emerging',note:'Rodent embryos exposed to hydrazine during neural tube closure develop neural tube defects. No large human study exists.'},
+    {d:'pkd',name:'Polycystic kidney disease',strength:'emerging',note:'The kidney is one of the primary organs where hydrazine is metabolized, exposing kidney cells to high local concentrations of reactive alkylating intermediates. Chronic exposure in animal studies produces cystic changes in the kidneys.'},
+  ]},
+  {id:'tce',short:'TCE / PCE (Chlorinated Solvents)',mechanism:'Trichloroethylene and tetrachloroethylene are degreasing solvents used on almost every military installation and in aerospace machine shops. They dissolve readily into groundwater and persist for decades. Once absorbed, the liver metabolises them into reactive intermediates that bind DNA, and they break down further into vinyl chloride, a known human carcinogen. Unlike most substances on this page, these cross the placenta efficiently and reach the embryo at close to maternal concentration. At Camp Lejeune, TCE in the Hadnot Point supply reached 1,400 micrograms per litre, 280 times the current federal limit, and PCE at Tarawa Terrace reached 215, some 43 times the limit. Contamination ran from the 1950s through 1987 and exposed as many as a million people.',targets:[
+    {d:'spina',name:'Spina bifida',strength:'strong',note:'ATSDR lists neural tube defects among the outcomes with positive findings for TCE and PCE. Ruckart et al. (2013) studied 12,493 children born to mothers living at Camp Lejeune between 1968 and 1985 and found first-trimester TCE and benzene exposure raised neural tube defect risk. Both agencies model exposure month by month from the mother’s actual residence, which makes this among the better-characterised exposure-to-birth-defect datasets in existence.'},
+    {d:'brain',name:'Brain tumors',strength:'moderate',note:'Ruckart et al. (2013) found childhood cancers, including hematopoietic cancers, elevated in association with PCE and vinyl chloride exposure. ATSDR grades the evidence for TCE and kidney cancer and non-Hodgkin lymphoma in adults as sufficient for causation. Childhood central nervous system tumours are less well characterised than the hematopoietic cancers but are part of the same signal.'},
+    {d:'vision',name:'Vision disorders',strength:'moderate',note:'ATSDR lists eye defects and choanal atresia among the birth defects with positive findings for TCE and PCE exposure. These are structural malformations arising in the same first-trimester window as neural tube defects, and they reflect disrupted neural crest cell migration rather than damage to a specific gene.'},
+    {d:'repro',name:'Reproductive issues',strength:'moderate',note:'ATSDR lists fetal death, miscarriage, low birth weight and small-for-gestational-age among outcomes with positive findings. Ruckart et al. (2014) examined preterm birth, small for gestational age and birth weight at Camp Lejeune specifically. Benzene, a co-contaminant, is independently associated with miscarriage.'},
+    {d:'wm',name:'White matter disease',strength:'emerging',note:'TCE is a documented neurotoxicant in occupational exposure, and the National Academies reviewed neurobehavioural effects in the Camp Lejeune population. Direct evidence for white matter abnormality in prenatally exposed children is limited, but the solvent crosses the placenta and the developing brain is the organ most sensitive to solvent exposure.'},
+    {d:'mental',name:'Mental / cognitive',strength:'emerging',note:'Neurobehavioural effects were significant enough that the National Academies reviewed them separately in their assessment of VA clinical guidance for Camp Lejeune conditions. Adult occupational solvent exposure produces measurable cognitive deficits; the prenatal question is biologically plausible and under-studied.'}
+  ]},
+  {id:'burn',short:'Burn Pits (PM2.5, VOCs, Dioxins)',mechanism:'Open-air burn pits disposed of plastics, electronics, medical waste, munitions and petroleum products, often accelerated with jet fuel. Incomplete combustion of chlorinated plastics generates dioxins — the same class of compound that made Agent Orange harmful — alongside fine particulate matter, benzene, polycyclic aromatic hydrocarbons and heavy metals. Fine particles below 2.5 micrometres cross from lung into bloodstream. The PACT Act of 2022 established presumptive service connection for service since 2 August 1990 in South West Asia and later added further conditions in 2024. Note that the presumptive list is built almost entirely around disease in the veteran; heritable effects in their children remain largely unstudied.',targets:[
+    {d:'brain',name:'Brain tumors',strength:'moderate',note:'Brain cancer is on the PACT Act presumptive list for burn pit exposure, which means the VA has accepted the association for benefits purposes without requiring individual proof of causation. That is an administrative and policy determination informed by evidence, not itself an epidemiological finding, but the underlying reviews support it.'},
+    {d:'repro',name:'Reproductive issues',strength:'emerging',note:'Dioxins generated by burning chlorinated plastics are the same compounds implicated in the Agent Orange reproductive findings, and the mechanism — AhR binding and endocrine disruption — is identical. Direct study of reproductive outcomes in burn pit cohorts is limited and recent. The VA Airborne Hazards and Open Burn Pit Registry exists partly to make this research possible.'},
+    {d:'thyroid',name:'Thyroid dysfunction',strength:'emerging',note:'Dioxin exposure disrupts thyroid hormone regulation, and burn pit emissions contain dioxins. Thyroid effects are documented in other dioxin-exposed populations rather than in burn pit cohorts specifically. This is a plausible-mechanism rating, not an outcome that has been measured in this population.'},
+    {d:'spina',name:'Spina bifida',strength:'emerging',note:'No burn pit cohort study has examined neural tube defects in offspring. The rating reflects the dioxin content of burn pit emissions and the established Agent Orange association with spina bifida, not direct evidence. This is exactly the kind of gap the combined-exposure section of this document describes: the study has not been done.'},
+    {d:'mental',name:'Mental / cognitive',strength:'emerging',note:'Fine particulate matter crosses into the bloodstream and is associated with neuroinflammation and cognitive effects in air pollution research generally. Deployment-related cognitive complaints are confounded by traumatic brain injury and PTSD, which makes the exposure signal difficult to isolate.'}
   ]},
 ];
 const strengthColor={strong:'#E24B4A',moderate:'#BA7517',emerging:'#378ADD'};
@@ -292,6 +436,15 @@ const svg2=document.getElementById('exp');
 const tabs2=document.getElementById('tabs2');
 const mechDiv=document.getElementById('mech-desc');
 const ns='http://www.w3.org/2000/svg';
+function makeOperable2(el,label,activate){
+  el.setAttribute('tabindex','0');
+  el.setAttribute('role','button');
+  el.setAttribute('aria-label',label);
+  el.addEventListener('click',activate);
+  el.addEventListener('keydown',ev=>{
+    if(ev.key==='Enter'||ev.key===' '||ev.key==='Spacebar'){ev.preventDefault();activate();}
+  });
+}
 exposures.forEach(exp=>{
   const btn=document.createElement('button');btn.textContent=exp.short;
   btn.addEventListener('click',()=>showExposure(exp.id));tabs2.appendChild(btn);
@@ -319,13 +472,20 @@ function showExposure(id){
     line.setAttribute('stroke-width',t.strength==='strong'?'2':t.strength==='moderate'?'1.2':'0.8');
     line.setAttribute('opacity',t.strength==='strong'?'0.6':t.strength==='moderate'?'0.4':'0.25');
     line.setAttribute('marker-end','url(#arrow2)');line.style.cursor='pointer';
+    // Dash pattern carries evidence strength alongside colour and weight, so the
+    // encoding survives colour-blindness and greyscale printing.
+    if(t.strength==='emerging')line.setAttribute('stroke-dasharray','3 4');
+    else if(t.strength==='moderate')line.setAttribute('stroke-dasharray','9 4');
     line.style.transition='opacity 0.15s, stroke-width 0.15s';
-    line.addEventListener('mouseenter',()=>{line.setAttribute('opacity','0.9');line.setAttribute('stroke-width','2.5');});
-    line.addEventListener('mouseleave',()=>{line.setAttribute('opacity',t.strength==='strong'?'0.6':t.strength==='moderate'?'0.4':'0.25');line.setAttribute('stroke-width',t.strength==='strong'?'2':t.strength==='moderate'?'1.2':'0.8');});
-    line.addEventListener('click',()=>{document.getElementById('info2').innerHTML=`<b>${exp.short} and ${t.name}</b> <span class="strength str-${t.strength}">${strengthLabels[t.strength]}</span><br>${t.note}`;});
+    const show=()=>{document.getElementById('info2').innerHTML=`<b>${exp.short} and ${t.name}</b> <span class="strength str-${t.strength}">${strengthLabels[t.strength]}</span><br>${t.note}`;};
+    const up=()=>{line.setAttribute('opacity','0.9');line.setAttribute('stroke-width','2.5');};
+    const down=()=>{line.setAttribute('opacity',t.strength==='strong'?'0.6':t.strength==='moderate'?'0.4':'0.25');line.setAttribute('stroke-width',t.strength==='strong'?'2':t.strength==='moderate'?'1.2':'0.8');};
+    line.addEventListener('mouseenter',up); line.addEventListener('focus',up);
+    line.addEventListener('mouseleave',down); line.addEventListener('blur',down);
+    makeOperable2(line, `${exp.short} and ${t.name}: ${strengthLabels[t.strength]}`, show);
     svg2.appendChild(line);
     const tg=document.createElementNS(ns,'g');tg.style.cursor='pointer';
-    tg.addEventListener('click',()=>{document.getElementById('info2').innerHTML=`<b>${exp.short} and ${t.name}</b> <span class="strength str-${t.strength}">${strengthLabels[t.strength]}</span><br>${t.note}`;});
+    makeOperable2(tg, `${t.name}: evidence from ${exp.short}`, show);
     const dot=document.createElementNS(ns,'circle');dot.setAttribute('cx',targetX);dot.setAttribute('cy',ty);dot.setAttribute('r','4');
     dot.setAttribute('fill',strengthColor[t.strength]);dot.setAttribute('opacity','0.6');tg.appendChild(dot);
     const label=document.createElementNS(ns,'text');label.setAttribute('x',targetX+12);label.setAttribute('y',ty);

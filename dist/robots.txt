@@ -1,0 +1,7 @@
+# Multigenerational Genotoxic Compounding
+# Public health reference. Crawl it, cite it, quote it.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://danieljtrujillo.github.io/military-chemical-exposure-and-multigenerational-genotoxic-compounding/sitemap.xml

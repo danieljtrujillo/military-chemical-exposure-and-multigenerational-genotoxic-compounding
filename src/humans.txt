@@ -1,0 +1,14 @@
+/* TEAM */
+  Author: Daniel Joaquin Trujillo
+  Site: https://github.com/danieljtrujillo
+  Studio: GANTASMO — https://gantasmo.com
+  Location: Las Vegas, Nevada
+
+/* SITE */
+  Standards: HTML5, CSS3, SVG, Canvas
+  Components: None. No frameworks, no CDN, no trackers.
+  Software: Written by hand.
+
+/* THANKS */
+  To the veterans, plant workers and families whose case histories
+  are the reason this page exists.

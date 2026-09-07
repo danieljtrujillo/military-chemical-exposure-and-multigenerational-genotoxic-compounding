@@ -1,0 +1,41 @@
+name: Check links
+
+# Legal, clinical and financial resource links go stale, and a dead link in a
+# medical reference is worse than a missing one. This sweeps them monthly so it
+# never has to be done by hand.
+on:
+  schedule:
+    - cron: '0 9 1 * *'   # 09:00 UTC on the 1st of each month
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check every outbound link
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --max-retries 2
+            --timeout 25
+            --accept 200,206,999
+            --exclude-path dist
+            src/index.html README.md CONTRIBUTING.md docs/
+          fail: false
+          output: lychee-report.md
+
+      - name: Open an issue if anything is broken
+        if: steps.lychee.outputs.exit_code != 0
+        uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: Dead links found in the monthly sweep
+          content-filepath: lychee-report.md
+          labels: maintenance, links

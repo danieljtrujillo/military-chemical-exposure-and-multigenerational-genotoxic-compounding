@@ -5,12 +5,13 @@
   --bg-tertiary: rgba(45, 42, 55, 0.85);
   --text-primary: #d8d6cf;
   --text-secondary: #a8a69e;
-  --text-tertiary: #7a786f;
+  --text-tertiary: #8e8c83;
   --border: rgba(255,255,255,0.12);
   --border-light: rgba(255,255,255,0.06);
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --radius: 8px;
   --radius-lg: 12px;
+  --accent: #E8622A;
   --info-bg: rgba(10,54,96,0.85); --info-text: #8fc2f0;
   --danger-bg: rgba(90,24,24,0.85); --danger-text: #f4a0a0;
   --warning-bg: rgba(74,42,6,0.85); --warning-text: #fad08a;
@@ -66,7 +67,10 @@ p { margin-bottom: 12px; font-size: 14px; }
 
 /* ===== Legend & Info Panels ===== */
 .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0; }
-.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); cursor: pointer; user-select: none; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); cursor: pointer; user-select: none;
+  background: none; border: 0; padding: 2px 0; margin: 0; font-family: var(--font); text-align: left; transition: opacity 0.18s, color 0.18s; }
+.legend-item:hover { color: var(--text-primary); }
+.legend-item[aria-pressed="true"] { color: var(--text-primary); }
 .legend-item.dimmed { opacity: 0.25; }
 .legend-swatch { width: 14px; height: 3px; border-radius: 2px; }
 .info-panel { background: var(--bg-secondary); border-radius: var(--radius); padding: 10px 14px; font-size: 13px; color: var(--text-secondary); min-height: 50px; margin-top: 8px; line-height: 1.6; }
@@ -110,3 +114,110 @@ details.accord .accord-body { padding: 0 14px 14px; }
 
 /* ===== SVG containers ===== */
 svg { background: rgba(0,0,0,0.25); border-radius: var(--radius); }
+/* ===== Skip Link ===== */
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 999;
+  background: var(--bg-tertiary); color: var(--text-primary);
+  padding: 10px 16px; border-radius: var(--radius);
+  font-size: 13px; text-decoration: none;
+}
+.skip-link:focus { left: 12px; top: 12px; outline: 2px solid var(--accent); }
+
+/* ===== Focus Visibility ===== */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+[tabindex]:focus:not(:focus-visible) { outline: none; }
+
+/* ===== Figures ===== */
+.figure { margin: 0 0 24px; }
+.figure figcaption {
+  font-size: 11.5px; color: var(--text-tertiary);
+  line-height: 1.5; margin-top: 8px; padding-left: 2px;
+  border-left: 2px solid var(--border); padding-left: 10px;
+}
+
+/* ===== Colophon ===== */
+.colophon {
+  margin-top: 18px; padding-top: 12px;
+  border-top: 0.5px solid var(--border-light);
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  font-size: 11px; color: var(--text-tertiary);
+}
+.colophon a { color: var(--text-tertiary); text-decoration: none; transition: color 0.18s; }
+.colophon a:hover { color: var(--accent); }
+.colophon .mark { display: inline-flex; align-items: center; gap: 6px; letter-spacing: 0.09em; }
+.colophon .mark svg { opacity: 0.7; transition: opacity 0.18s; }
+.colophon .mark:hover svg { opacity: 1; }
+.colophon-sep { opacity: 0.35; }
+
+/* ===== Motion Preferences ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  canvas#c { display: none; }
+  body { background: #08060f; }
+}
+
+/* ===== Print ===== */
+@media print {
+  canvas#c, .skip-link, .tab-bar { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .content-wrapper { background: none !important; max-width: none; padding: 0; }
+  .prose, p, .card-body, .accord-body { color: #000 !important; }
+  h1, h2, h3, .card-title, .term, .info-title { color: #000 !important; }
+  details.accord { border-color: #999 !important; }
+  details.accord .accord-body { display: block !important; }
+  svg { background: none !important; border: 1px solid #ccc; page-break-inside: avoid; }
+  .figure, .card, .callout { page-break-inside: avoid; }
+  a { color: #000 !important; text-decoration: underline; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9px; color: #555; word-break: break-all; }
+  .footer { border-top: 1px solid #999; color: #333 !important; }
+}
+
+/* ===== Network Text View ===== */
+/* The same data as Figure 1, as text. Primary view on narrow screens, a
+   collapsible text alternative on wide ones, always present in the DOM. */
+.net-list-wrap { margin-top: 20px; }
+.net-list-heading { font-size: 14px; font-weight: 500; margin: 0 0 4px; }
+.net-list-item summary { font-size: 13px; }
+.net-list-item summary .dot {
+  display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; margin-right: 8px; vertical-align: middle;
+}
+.net-list-cat {
+  font-size: 11px; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin: 10px 0 6px; padding-top: 8px;
+  border-top: 0.5px solid var(--border-light);
+}
+.net-list-links { list-style: none; margin: 0; padding: 0; }
+.net-list-links li {
+  font-size: 12.5px; line-height: 1.6; color: var(--text-secondary);
+  padding: 8px 0 8px 12px; margin-bottom: 2px;
+  border-left: 2px solid var(--border);
+}
+.net-list-links li a { color: var(--text-primary); text-decoration: none; }
+.net-list-links li a:hover { color: var(--accent); }
+.pathway-tag { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; }
+.noscript-note {
+  background: var(--bg-secondary); border-left: 2px solid var(--accent);
+  padding: 10px 14px; font-size: 13px; color: var(--text-secondary); margin: 8px 0;
+}
+
+/* Narrow screens: the diagram scales its 680px viewBox down to ~310px, which
+   renders labels at about 5px. Show the text instead. */
+@media (max-width: 700px) {
+  #fig-network #net,
+  #fig-network #legend1 { display: none; }
+  #fig-network #info1 { display: none; }
+  .net-list-wrap { margin-top: 0; }
+}
+
+@media print {
+  .net-list-item[open] .accord-body,
+  .net-list-item .accord-body { display: block !important; }
+  .net-list-links li { border-left-color: #ccc; }
+}

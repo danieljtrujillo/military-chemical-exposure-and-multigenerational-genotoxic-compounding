@@ -16,3 +16,8 @@ npm-debug.log*
 
 # Dependencies
 node_modules/
+__pycache__/
+*.pyc
+
+# Tooling
+.playwright-mcp/
