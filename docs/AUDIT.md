@@ -280,10 +280,19 @@ what happened: adding TCE/PCE and burn pits in the second pass left Figure 3 sti
 showing only five toxicants, because it is not driven by the same data as Figures 1
 and 2.
 
-**✅ Fixed (third pass).** Figure 3 now shows all seven toxicant groups. Rather than
-draw arrows from seven boxes to three damage routes — twenty crossing lines — the
-toxicants are grouped into one banded tier with three arrows out of it. Which toxicant
-drives which outcome is Figure 2's job, and it does it better.
+**✅ Fixed (third pass).** Figure 3 now shows all seven toxicant groups with the
+toxicant-to-damage-route arrows intact: 15, up from the original 9.
+
+An intermediate version of this fix collapsed those 9 arrows into 3 from a grouped
+band, on the reasoning that Figure 2 already carried the detail. That reasoning was
+wrong. Figure 2 maps toxicant to *disease*; the toxicant to *damage route* mapping
+exists only here, and losing it erased the page's sharpest point — that ammonium
+perchlorate reaches hormone disruption **only**, never mutagenesis, because it does not
+damage DNA at all. The arrows are restored.
+
+One arrow is new rather than restored: dioxin now also reaches hormone disruption,
+which its own mechanism text ("disrupts estrogen and androgen signaling") and its
+endometriosis and thyroid links already support.
 
 **Still open:** it is still hand-placed, so it can still drift out of step with the data.
 Generating it from a tier/box structure in `script.js` remains the real fix. *Effort:
