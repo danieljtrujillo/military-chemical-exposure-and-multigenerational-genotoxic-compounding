@@ -274,65 +274,129 @@ nodes.forEach(n=>{
   svg.appendChild(g);
 });
 // ---------------------------------------------------------------------------
-// Text view of the network.
+// Compact view of the network.
 //
-// At 375px the SVG scales its 680px viewBox down to ~312px, which renders the
-// 11px node labels at about 5px - unreadable. Rather than shrink the diagram
-// further, narrow screens get this list instead. It carries exactly the same
-// data, it is what a screen reader reads, and unlike the SVG it is text a
-// search engine can index.
+// Every condition renders twice:
+//
+//   1. As a tile in an equal-width grid. Sixteen full-width accordion rows cost
+//      roughly 700px of scroll even when collapsed; the same sixteen as tiles
+//      cost about 300px, and clicking one opens a modal rather than pushing the
+//      rest of the page down.
+//   2. As a full article in a hidden container, which is what the modal shows,
+//      what a screen reader can reach, what prints, and what a crawler indexes.
+//      Nothing here is loaded on demand, so no content depends on JavaScript
+//      having run or on the modal having been opened.
 // ---------------------------------------------------------------------------
 const catLabels={genetic:'Genetic',neoplastic:'Neoplastic',neuro:'Brain and nerve',structural:'Structural',inflammatory:'Inflammatory',endocrine:'Endocrine'};
-const netList=document.getElementById('net-list');
-if(netList){
+const netGrid=document.getElementById('net-grid');
+const netDetails=document.getElementById('net-details');
+const dlg=document.getElementById('condition-dialog');
+const dlgBody=document.getElementById('condition-dialog-body');
+const dlgTitle=document.getElementById('condition-dialog-title');
+
+function connectionsFor(n){
+  return edges.filter(e=>e.from===n.id||e.to===n.id);
+}
+
+function detailMarkup(n){
+  const conns=connectionsFor(n);
+  const links=conns.map(e=>{
+    const otherId=e.from===n.id?e.to:e.from;
+    const other=nodes.find(nd=>nd.id===otherId);
+    return `<li><a href="#condition-${otherId}" data-condition="${otherId}"><b>${other.label}</b></a> `+
+           `<span class="pathway-tag" style="color:${pathways[e.path].color}">${pathways[e.path].label}</span>`+
+           `<br>${e.info}</li>`;
+  }).join('');
+  return `<p class="net-detail-cat">${catLabels[n.cat]||n.cat} \u00b7 connected to `+
+         `${conns.length} other condition${conns.length===1?'':'s'}</p>`+
+         `<p>${n.desc}</p>`+
+         `<ul class="net-list-links">${links}</ul>`;
+}
+
+if(netGrid&&netDetails){
   nodes.forEach(n=>{
-    const conns=edges.filter(e=>e.from===n.id||e.to===n.id);
-    const d=document.createElement('details');
-    d.className='accord net-list-item';
-    d.id='condition-'+n.id;
+    const conns=connectionsFor(n);
 
-    const s=document.createElement('summary');
-    s.innerHTML=`<span><span class="dot" style="background:${catColors[n.cat]}"></span>${n.label}</span>`;
-    d.appendChild(s);
+    const tile=document.createElement('button');
+    tile.type='button';
+    tile.className='net-tile';
+    tile.dataset.condition=n.id;
+    tile.setAttribute('aria-haspopup','dialog');
+    // The count is a bare numeral so the label keeps the width. The word it
+    // stands for lives in the tooltip and the accessible name.
+    const plural=conns.length===1?'connection':'connections';
+    tile.title=`${n.label} — ${conns.length} ${plural}`;
+    tile.setAttribute('aria-label',`${n.label}, ${conns.length} ${plural}`);
+    tile.innerHTML=
+      `<span class="net-tile-dot" style="background:${catColors[n.cat]}"></span>`+
+      `<span class="net-tile-label">${n.label}</span>`+
+      `<span class="net-tile-meta" aria-hidden="true">${conns.length}</span>`;
+    netGrid.appendChild(tile);
 
-    const body=document.createElement('div');
-    body.className='accord-body prose';
-    const desc=document.createElement('p');
-    desc.textContent=n.desc;
-    body.appendChild(desc);
-
-    const h=document.createElement('p');
-    h.className='net-list-cat';
-    h.textContent=`${catLabels[n.cat]||n.cat} · connected to ${conns.length} other condition${conns.length===1?'':'s'}`;
-    body.appendChild(h);
-
-    const ul=document.createElement('ul');
-    ul.className='net-list-links';
-    conns.forEach(e=>{
-      const otherId=e.from===n.id?e.to:e.from;
-      const other=nodes.find(nd=>nd.id===otherId);
-      const li=document.createElement('li');
-      li.innerHTML=`<a href="#condition-${otherId}"><b>${other.label}</b></a> <span class="pathway-tag" style="color:${pathways[e.path].color}">${pathways[e.path].label}</span><br>${e.info}`;
-      ul.appendChild(li);
-    });
-    body.appendChild(ul);
-    d.appendChild(body);
-    netList.appendChild(d);
+    // The indexable, printable, no-JavaScript copy.
+    const art=document.createElement('article');
+    art.className='net-detail';
+    art.id='condition-'+n.id;
+    art.innerHTML=`<h4>${n.label}</h4>`+detailMarkup(n);
+    netDetails.appendChild(art);
   });
 }
 
-// Narrow screens get the list; wide screens get the diagram with the list
-// available underneath as a text alternative.
-const narrow=window.matchMedia('(max-width: 700px)');
-function applyView(){
-  const isNarrow=narrow.matches;
-  const fig=document.getElementById('fig-network');
-  if(fig)fig.classList.toggle('is-narrow',isNarrow);
-  if(netList&&isNarrow)netList.classList.add('is-primary');
-  else if(netList)netList.classList.remove('is-primary');
+// --- Modal -----------------------------------------------------------------
+let lastFocused=null;
+
+function openCondition(id,trigger){
+  const n=nodes.find(nd=>nd.id===id);
+  if(!n||!dlg)return;
+  dlgTitle.textContent=n.label;
+  dlgBody.innerHTML=detailMarkup(n);
+  dlgBody.scrollTop=0;
+  if(!dlg.open){
+    // Remember the element that opened this, so focus can go back to it. Taken
+    // from the trigger rather than document.activeElement: a click does not
+    // always leave the button focused, and a cross-reference inside the dialog
+    // must not overwrite the original opener.
+    lastFocused=trigger||document.activeElement;
+    if(typeof dlg.showModal==='function')dlg.showModal();
+    else dlg.setAttribute('open','');
+  }
 }
-if(narrow.addEventListener)narrow.addEventListener('change',applyView);
-applyView();
+
+function closeCondition(){
+  if(!dlg||!dlg.open)return;
+  if(typeof dlg.close==='function')dlg.close();
+  else dlg.removeAttribute('open');
+}
+
+if(dlg){
+  // Tile opens it; a cross-reference inside it swaps to the next condition
+  // rather than closing and reopening.
+  document.addEventListener('click',ev=>{
+    const trigger=ev.target.closest('[data-condition]');
+    if(!trigger)return;
+    ev.preventDefault();
+    openCondition(trigger.dataset.condition, trigger.closest('.net-tile') || trigger);
+  });
+
+  // Clicking the backdrop closes. The dialog element fills its own box, so a
+  // click landing on <dialog> itself is a click outside the panel.
+  dlg.addEventListener('click',ev=>{ if(ev.target===dlg)closeCondition(); });
+  dlg.addEventListener('close',()=>{
+    if(lastFocused&&document.contains(lastFocused))lastFocused.focus();
+    lastFocused=null;
+  });
+  const closeBtn=document.getElementById('condition-dialog-close');
+  if(closeBtn)closeBtn.addEventListener('click',closeCondition);
+}
+
+// Deep links such as #condition-tsc open the modal instead of jumping to the
+// hidden copy, so a shared link lands somewhere that looks intentional.
+function openFromHash(){
+  const m=/^#condition-([a-z0-9]+)$/.exec(window.location.hash||'');
+  if(m)openCondition(m[1]);
+}
+window.addEventListener('hashchange',openFromHash);
+openFromHash();
 
 const leg=document.getElementById('legend1');
 // Only offer a filter for pathways that actually connect something. A legend

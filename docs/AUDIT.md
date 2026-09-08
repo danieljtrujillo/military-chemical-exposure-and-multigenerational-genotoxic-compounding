@@ -10,9 +10,9 @@ A sweep of the site as it stands, and what to do about it. Findings are ordered 
 impact, and each one says how big the job is. Items marked **✅ done** were fixed in
 the pass that produced this document; everything else is a recommendation.
 
-**Audit date:** 2026-09-07 · **Second pass:** 2026-09-07, items 1–6 implemented
+**Audit date:** 2026-09-07 · **Second pass:** 2026-09-07 · **Third pass:** 2026-09-08
 
-**Current build:** `dist/index.html`, 173 KB, 16 conditions, 8 toxicants, 36 mapped connections, 37 citations, 678 data-integrity checks passing
+**Current build:** `dist/index.html`, 179 KB, 16 conditions, 8 toxicants, 36 mapped connections, 37 citations, 678 data-integrity checks passing
 
 ---
 
@@ -74,6 +74,18 @@ condition descriptions and all 72 connection entries, each with its pathway and 
 published evidence. It is always in the DOM, so it is simultaneously the mobile view,
 the screen-reader alternative, and indexable text — page text went from 17,555 to
 23,235 characters as a result.
+
+**✅ Compacted further (third pass).** Sixteen full-width accordion rows cost roughly
+700px of scroll even collapsed. The same sixteen now render as an equal-width tile grid
+— **163px on desktop** at four across, **329px on mobile** at two across — and selecting
+one opens a modal rather than pushing the rest of the page down.
+
+No content was cut. Every condition still renders a full article into a hidden container
+that is what the modal displays, what screen readers reach, what prints, and what a
+crawler indexes; 16 articles and all 72 connection entries remain in the DOM. Labels wrap
+rather than truncate, so no condition name is ever clipped. Deep links such as
+`#condition-endo` open the modal directly, cross-references inside it swap condition
+without closing, and focus returns to the tile that opened it.
 
 Option 1, a second node-position table for narrow screens, is still worth doing if you
 want the picture rather than the text on a phone. It is no longer urgent.
@@ -260,12 +272,22 @@ pay triple fill cost for a background nobody looks at directly.
 `requestAnimationFrame`, stops when the tab is hidden, and never starts for visitors who
 have asked for reduced motion.
 
-### 3.4 Figure 3 is 60 lines of hand-placed SVG
+### 3.4 Figure 3 is hand-placed SVG
 
-The convergence model is literally hand-written `<rect>` and `<line>` elements with
-absolute coordinates in the HTML. Any content change means recomputing geometry by hand.
-Move it to a small generator in `script.js` driven by a tier/box data structure, the way
-Figures 1 and 2 already work. *Effort: medium. Do this before, not after, adding exposures.*
+The convergence model is hand-written `<rect>` and `<line>` elements with absolute
+coordinates. Any content change means recomputing geometry by hand — which is exactly
+what happened: adding TCE/PCE and burn pits in the second pass left Figure 3 still
+showing only five toxicants, because it is not driven by the same data as Figures 1
+and 2.
+
+**✅ Fixed (third pass).** Figure 3 now shows all seven toxicant groups. Rather than
+draw arrows from seven boxes to three damage routes — twenty crossing lines — the
+toxicants are grouped into one banded tier with three arrows out of it. Which toxicant
+drives which outcome is Figure 2's job, and it does it better.
+
+**Still open:** it is still hand-placed, so it can still drift out of step with the data.
+Generating it from a tier/box structure in `script.js` remains the real fix. *Effort:
+medium.*
 
 ### 3.5 Graphics worth adding
 
@@ -314,6 +336,8 @@ Figures 1 and 2 already work. *Effort: medium. Do this before, not after, adding
 - **✅ One canonical URL.** `DEFAULT_SITE_URL` in `tools/build.js` now drives all 21
   absolute URLs across the HTML, sitemap and robots.txt. Overridable with
   `SITE_URL=... node tools/build.js`.
+- **✅ CI runs on Node 24.** It was pinned to Node 20, which reached end of life in
+  April 2026 and no longer receives security updates. Now matches the local toolchain.
 - **No issue templates.** Low priority, but templates shaped around “report a dead
   resource link” and “propose an evidence link” would channel exactly the contributions
   this project wants. The link checker now files the first kind automatically.
@@ -361,6 +385,10 @@ exposures, the mobile list view, the action path, the installation index, the gl
 the methodology section, the data-integrity test, the link checker, canonical-URL
 centralisation, dual encoding in Figure 2, DPR scaling, and `<noscript>` fallbacks.
 
+**Done in the third pass:** CI moved off end-of-life Node 20 to Node 24; Figure 3
+updated to carry all eight exposures; the condition list compacted from ~700px of
+stacked rows to a 163px tile grid with a modal, losing no content.
+
 **What is left, in order:**
 
 | # | Item | Section | Effort |
@@ -372,7 +400,7 @@ centralisation, dual encoding in Figure 2, DPR scaling, and `<noscript>` fallbac
 | 5 | Hub-and-spoke page split | [SEO.md](SEO.md) §2.1 | L |
 | 6 | Add PFAS/AFFF, JP-8/benzene, depleted uranium, lead | §2.2 | M |
 | 7 | Mobile node-position table, so the *picture* works on a phone too | §1.1 | M |
-| 8 | Regenerate Figure 3 from data instead of hand-placed SVG | §3.4 | M |
+| 8 | Generate Figure 3 from data so it cannot drift again | §3.4 | M |
 | 9 | Generational timeline figure | §3.5 | M |
 | 10 | Named clinical reviewer + visible changelog | [SEO.md](SEO.md) §3.1 | — |
 

@@ -177,47 +177,128 @@ svg { background: rgba(0,0,0,0.25); border-radius: var(--radius); }
   .footer { border-top: 1px solid #999; color: #333 !important; }
 }
 
-/* ===== Network Text View ===== */
-/* The same data as Figure 1, as text. Primary view on narrow screens, a
-   collapsible text alternative on wide ones, always present in the DOM. */
+/* ===== Network Compact View ===== */
+/* Sixteen full-width accordion rows cost ~700px of scroll even collapsed. The
+   same sixteen as equal-width tiles cost ~300px, and open a modal instead of
+   pushing the rest of the page down. */
 .net-list-wrap { margin-top: 20px; }
 .net-list-heading { font-size: 14px; font-weight: 500; margin: 0 0 4px; }
-.net-list-item summary { font-size: 13px; }
-.net-list-item summary .dot {
-  display: inline-block; width: 8px; height: 8px;
-  border-radius: 50%; margin-right: 8px; vertical-align: middle;
+
+.net-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+  margin-top: 10px;
 }
-.net-list-cat {
-  font-size: 11px; color: var(--text-tertiary);
+.net-tile {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  width: 100%;
+  min-width: 0;
+  padding: 9px 11px;
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.net-tile:hover { background: var(--bg-tertiary); border-color: var(--accent); }
+.net-tile:active { transform: translateY(1px); }
+.net-tile-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; transform: translateY(1px); }
+/* Wrap rather than truncate: a clipped condition name is content cut.
+   overflow-wrap handles the single long words - Neurofibromatosis, Pseudotumor -
+   that have no natural break point on a narrow screen. */
+.net-tile-label {
+  flex: 1 1 auto; min-width: 0; line-height: 1.35;
+  overflow-wrap: break-word; hyphens: auto;
+}
+.net-tile-meta {
+  flex: none; font-size: 10px; color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+  min-width: 12px; text-align: right;
+}
+
+/* The indexable, printable copy. Present in the DOM, not on screen. */
+.net-details { display: none; }
+
+/* ===== Condition Modal ===== */
+#condition-dialog {
+  border: none; padding: 0; background: transparent;
+  max-width: 620px; width: calc(100% - 32px); max-height: 84vh;
+  margin: auto;              /* setting width drops the UA centering */
+  color: var(--text-primary);
+}
+#condition-dialog::backdrop { background: rgba(2, 1, 8, 0.72); backdrop-filter: blur(2px); }
+.dialog-panel {
+  display: flex; flex-direction: column; max-height: 84vh;
+  background: #14121f;
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.dialog-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 0.5px solid var(--border);
+}
+.dialog-head h3 { font-size: 15px; font-weight: 500; margin: 0; }
+.dialog-close {
+  flex: none; width: 28px; height: 28px; line-height: 1;
+  background: none; border: 0.5px solid var(--border); border-radius: var(--radius);
+  color: var(--text-secondary); font-size: 18px; cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.dialog-close:hover { color: var(--accent); border-color: var(--accent); }
+.dialog-body { padding: 14px 16px 18px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.dialog-body p { font-size: 13px; }
+
+.net-detail-cat {
+  font-size: 10.5px; color: var(--text-tertiary);
   text-transform: uppercase; letter-spacing: 0.06em;
-  margin: 10px 0 6px; padding-top: 8px;
-  border-top: 0.5px solid var(--border-light);
+  margin: 0 0 10px;
 }
-.net-list-links { list-style: none; margin: 0; padding: 0; }
+.net-list-links { list-style: none; margin: 12px 0 0; padding: 0; }
 .net-list-links li {
   font-size: 12.5px; line-height: 1.6; color: var(--text-secondary);
-  padding: 8px 0 8px 12px; margin-bottom: 2px;
+  padding: 9px 0 9px 12px; margin-bottom: 2px;
   border-left: 2px solid var(--border);
 }
 .net-list-links li a { color: var(--text-primary); text-decoration: none; }
 .net-list-links li a:hover { color: var(--accent); }
 .pathway-tag { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.05em; }
+
 .noscript-note {
   background: var(--bg-secondary); border-left: 2px solid var(--accent);
   padding: 10px 14px; font-size: 13px; color: var(--text-secondary); margin: 8px 0;
 }
 
 /* Narrow screens: the diagram scales its 680px viewBox down to ~310px, which
-   renders labels at about 5px. Show the text instead. */
+   renders labels at about 5px. Show the tiles instead. */
 @media (max-width: 700px) {
   #fig-network #net,
-  #fig-network #legend1 { display: none; }
+  #fig-network #legend1,
   #fig-network #info1 { display: none; }
   .net-list-wrap { margin-top: 0; }
+  /* Slightly tighter so the longest single-word labels still fit one line at
+     two columns; break-word remains the fallback below that. */
+  .net-grid { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 5px; }
+  .net-tile { font-size: 11px; padding: 9px 9px; gap: 6px; }
+  .net-tile-meta { font-size: 9.5px; }
+  #condition-dialog { max-height: 90vh; width: calc(100% - 16px); }
+  .dialog-panel { max-height: 90vh; }
 }
 
+/* Print: no modal, so the hidden copy carries the content instead. */
 @media print {
-  .net-list-item[open] .accord-body,
-  .net-list-item .accord-body { display: block !important; }
+  .net-grid, #condition-dialog { display: none !important; }
+  .net-details { display: block !important; }
+  .net-detail { page-break-inside: avoid; margin-bottom: 14px; }
+  .net-detail h4 { font-size: 13px; margin: 0 0 4px; }
   .net-list-links li { border-left-color: #ccc; }
 }

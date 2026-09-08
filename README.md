@@ -13,7 +13,7 @@
 ![Toxicants](https://img.shields.io/badge/TOXICANTS-8-E8622A?style=flat-square&labelColor=0B0B0C)
 ![Connections](https://img.shields.io/badge/MAPPED_CONNECTIONS-36-E8622A?style=flat-square&labelColor=0B0B0C)
 ![Citations](https://img.shields.io/badge/CITATIONS-37-8B8A85?style=flat-square&labelColor=0B0B0C)
-![Page weight](https://img.shields.io/badge/PAGE_WEIGHT-173_KB-8B8A85?style=flat-square&labelColor=0B0B0C)
+![Page weight](https://img.shields.io/badge/PAGE_WEIGHT-179_KB-8B8A85?style=flat-square&labelColor=0B0B0C)
 
 **[Read the map](#what-this-is)** · **[How evidence is graded](#how-evidence-is-graded)** · **[Run it locally](#run-it-locally)** · **[Add evidence](CONTRIBUTING.md)** · **[Cite it](#citing-this-work)**
 
@@ -50,6 +50,9 @@ It is a single self-contained web page. No framework, no CDN, no analytics, no c
 | **03** | **Multi-hit convergence** | A static flowchart of the whole chain: toxicants → three damage routes → inherited genetic vulnerability → disease clusters. Knudson's two-hit hypothesis, extended to combined occupational and inherited risk. |
 
 Every figure is keyboard-operable and carries an SVG `<title>` and `<desc>` for screen readers.
+Below the diagram, all 16 conditions and all 72 connection entries are also available as a
+compact tile grid that opens each condition in a modal — which is simultaneously the mobile
+view, the screen-reader alternative, the printed copy, and what search engines index.
 
 <details>
 <summary><b>The eight toxicants covered</b></summary>
